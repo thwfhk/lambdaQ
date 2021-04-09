@@ -23,6 +23,9 @@
 %Import the natbib package and sets a bibliography style
 \usepackage{natbib}
 
+% \setmonofont{Fira Code}
+% \setsansfont[BoldFont={Fira Sans Medium}]{Fira Sans Light}
+
 \newfontfamily{\lstfont}[Scale=.85]{Fira Sans}
 
 \hypersetup{hidelinks}
@@ -39,6 +42,16 @@
 \newtheorem{Thm}{Theorem}
 \newtheorem{Prop}{Proposition}
 \newtheorem{Proof}{Proof}
+
+% \usepackage{unicode-math}
+% \setmathfont{STIX Two Math}
+% 字体更换
+% \usepackage{newtxtext}
+\usepackage{newtxmath}
+% \DeclareSymbolFont{CMlargesymbols}{OMX}{cmex}{m}{n}
+% \let\sumop\relax\let\prodop\relax
+% \DeclareMathSymbol{\sumop}{\mathop}{CMlargesymbols}{"50}
+% \DeclareMathSymbol{\prodop}{\mathop}{CMlargesymbols}{"51}
 
 % \usepackage{listings}
 % \definecolor{light-gray}{gray}{0.85}
@@ -96,9 +109,9 @@
       & &$(t, t)$ &pair\\
       & &$t.1$ &first projection\\
       & &$t.2$ &second projection\\
-      & &$\mathit{if}\ t\ \mathit{then}\ t\ \mathit{else}\ t$ &conditional\\
-      & &$\mathit{run}\ C$ &static lifting\\
-      & &$\zeta \ p:W . C$ &circuit abstraction\\
+      & &$\tif\ t\ \tthen\ t\ \telse\ t$ &conditional\\
+      & &$\trun\ C$ &static lifting\\
+      & &$\kappa \ p:W . C$ &circuit abstraction\\
       % & &0 &constant zero\\
       % & &succ $t$ &successor\\
       % & &pred $t$ &predecessor\\
@@ -111,7 +124,7 @@
       & &$\unit$ &unit value\\
       & &$\true$ &true value\\
       & &$\false$ &false value\\
-      & &$\zeta\ p:W . C$ &circuit value\\
+      & &$\kappa\ p:W . C$ &circuit value\\
   \\
 
   $T$ &$::=$ &  &\textbf{types}: \\
@@ -131,9 +144,9 @@
 
 
   $W$ &$::=$ &  &\textbf{wire types}: \\
-      & &$One$ &wire unit type\\
-      & &$Bit$ &bit type \\
-      & &$Qubit$ &qubit type \\
+      & &$\One$ &wire unit type\\
+      & &$\Bit$ &bit type \\
+      & &$\Qubit$ &qubit type \\
       & &$W \otimes W$ &wire product type \\
   \\
 
@@ -144,11 +157,24 @@
   \\
 
   $C$ &$::=$ &  &\textbf{circuits}: \\
-      & &$\mathit{output}\ p$ &output a pattern \\
+      & &$\toutput\ p$ &output a pattern \\
       & &$p_2 \from \gate\ g\ p_1 ; C$ &gate application \\
       & &$p \from C ; C$ &circuit composition \\
       & &$x \From \lift\ p ; C$ &dynamic lifting \\
-      & &$\unbox\ t\ p$ &circuit application \\
+      & &$\capp\ t\ p$ &circuit application \\
+  \\
+
+  $g$ &$::=$ &  &\textbf{gates}: \\
+      & &$\new_0$ &generate a bit 0 \\
+      & &$\new_1$ &generate a bit 1 \\
+      & &$\init_0$ &generate a qubit 0 \\
+      & &$\init_1$ &generate a qubit 1 \\
+      & &$\meas$ &measurement gate \\
+      & &$\discard$ &disgard gate \\
+  \\
+
+  $G$ &$::=$ &  &\textbf{gate types}:\\
+      & &$\mathcal{G}(W, W)$ &simple gate type\\
   \\
 
   $\Omega$ &$::=$ &  &\textbf{wire contexts}: \\
@@ -168,39 +194,71 @@ First, we need to define what is a well-formed wire context.
   For simplicity, we always assume the wire contexts are well-formed in the following contexts. And when we write $\Omega_1, \Omega_2$, we require $\Omega_1$ and $\Omega_2$ to be disjoint to preserve the well-formedness.
 \end{Def}
 
-Since there are three different kinds of terms: ($\lambda$-)terms, wire patterns and circuits, we have three different relations for each of them to check the correctness.
+Since there are some different kinds of terms: ($\lambda$-)terms, wire patterns, gates and circuits, we have different relations for each of them to check the correctness.
 \begin{itemize}
   \item $\Omega \Rightarrow p : W$ is used to check the well-formedness of patterns.
   \item $\Gamma ; \Omega \vdash C : W$ is the typing relation for circuits;
   \item $\Gamma \vdash t:T$ is the typing relation for ($\lambda$-)terms;
+  \item $g : G$ is the typing relation for gates;
 \end{itemize}
+
+\subsection{Typing rules for gates}
+Note that because we only support built-in gates, the typing rules for gates are extremely simple, just assigning a type to each built-in gate.
+
+\noindent \textbf{Typing rules for gates}: $\boxed{g : G}$
+\renewcommand\arraystretch{2.5}
+\begin{longtable}[c]{cr}
+  $ \infer{\new_0 : \calG(\One, \Bit)}{}$ & \\
+  $ \infer{\new_1 : \calG(\One, \Bit)}{}$ & \\
+  $ \infer{\init_0 : \calG(\One, \Qubit)}{}$ & \\
+  $ \infer{\init_1 : \calG(\One, \Qubit)}{}$ & \\
+  $ \infer{\meas : \calG(\Qubit, \Bit)}{}$ & \\
+  $ \infer{\discard : \calG(\Bit, \One)}{}$ & \\
+\end{longtable}
+
+\subsection{Well-formed patterns}
 
 \noindent \textbf{Well-formed patterns}: $\boxed{\Omega \Rightarrow p : W}$
 
 \renewcommand\arraystretch{2.5}
 \begin{longtable}[c]{cr}
   $ \infer{\varnothing \To ():One}{}$ & \\
-  $ \infer{w:W \To w:Wz}{}$ & \\
+  $ \infer{w:W \To w:W}{}$ & \\
   $ \infer{\Omega_1, \Omega_2 \Rightarrow (p_1,p_2):W_1\otimes W_2}{\Omega_1 \To p_1 : W_1  &\Omega_2 \To p_2 : W_2} $ & \\
 \end{longtable}
 
+\subsection{Typing rules for circuits}
+
 \noindent \textbf{Typing rules for circuits}: $\boxed{\Gamma;\Omega\vdash C:W}$
 
-{\color{red} TODO: add typing rules for circuits.}
 
-% \begin{longtable}[c]{cr}
-%   $\infer{\Gamma\vdash x:T}{x:T\in\Gamma &\Gamma\vdash T::*}$ &(T-VAR)\\
-%   $\infer{\Gamma\vdash \lambda x:S.t\ :\Pi x:S.T}{\Gamma\vdash S::* &\Gamma,x:S\vdash t:T}$ &(T-ABS)\\
-%   $\infer{\Gamma \vdash t_1\ t_2 : [x\mapsto t_2]T}{\Gamma\vdash t_1:\Pi x:S.T &\Gamma\vdash t_2:S}$ &(T-APP)\\
-%   $\infer{\Gamma\vdash (t_1,t_2:\Sigma x:S.T)\ :\Sigma x:S.T}{\Gamma \vdash t_1:S &\Gamma\vdash t_2:[x\mapsto t_1]T}$ &(T-PAIR)\\
-%   $\infer{\Gamma\vdash t.1:S}{\Gamma\vdash t:\Sigma x:S.T}$ &(T-PROJ1)\\
-%   $\infer{\Gamma\vdash t.2:[x\mapsto t.1]T}{\Gamma\vdash t:\Sigma x:S.T}$ &(T-PROJ2)\\
-%   $\infer{\Gamma\vdash t:T'}{\Gamma\vdash t:T &\Gamma\vdash T\equiv T'::*}$ &(T-CONV)\\
-% \end{longtable}
+\renewcommand\arraystretch{3}
+\begin{longtable}[c]{cr}
+  $\infer{\Gamma;\Omega\vdash \toutput\ p:W}{\Omega\To p : W}$ &(C-OUTPUT)\\
+  $\infer{\Gamma;\Omega_1,\Omega\vdash p_2 \from \gate\ g\ p_1 ; C:W}{g:\calG(W_1, W_2) &\Omega_1\To p_1:W_1 &\Omega_2\To p_2:W_2 &\Gamma ; \Omega_2,\Omega \vdash C:W}$ &(C-GATE)\\
+  $\infer{\Gamma;\Omega_1,\Omega_2\vdash p \from C ; C':W'}{\Gamma;\Omega_1\vdash C:W &\Omega \To p:W &\Gamma;\Omega,\Omega_2 \vdash C':W'}$ &(C-COMPOSE)\\
+  $\infer{\Gamma;\Omega,\Omega'\vdash x \From \lift\ p ; C:W'}{\Omega\To p:W &\Gamma,x:|W|;\Omega' \vdash C:W'}$ &(C-LIFT)\\
+  $\infer{\Gamma;\Omega\vdash \capp\ t\ p : W_2}{\Gamma\vdash t:W_1\leadsto W_2 &\Omega\To p:W_1}$ &(C-CAPP)\\
+\end{longtable}
 
+\subsection{Typing rules for terms}
 \noindent \textbf{Typing rules for ($\lambda$-)terms}: $\boxed{\Gamma\vdash t:T}$
 
-{\color{red} TODO: add typing rules for terms.}
+\renewcommand\arraystretch{3}
+\begin{longtable}[c]{cr}
+  $\infer{\Gamma\vdash \trun\ C : |W| }{\Gamma;\varnothing \vdash C:W}$ &(T-RUN)\\
+  $\infer{\Gamma\vdash \kappa\ p:W_1 . C: W_1\leadsto W_2 }{\Omega\To p:W_1 &\Gamma;\Omega\vdash C:W_2}$ &(T-CABS)\\
+  $\infer{\Gamma\vdash x:T}{x:T\in \Gamma}$ &(T-VAR)\\
+  $\infer{\Gamma\vdash \lambda\ x:T_1.t_2 : T_1\to T_2}{\Gamma,x:T_1 \vdash t_2:T_2}$ &(T-ABS)\\
+  $\infer{\Gamma\vdash t_1\ t_2 : T_{12}}{\Gamma\vdash t_1:T_{11}\to T_{12} & \Gamma\vdash t_2:T_{11}}$ &(T-APP)\\
+  $\infer{\Gamma\vdash\true : Bool}{}$ &(T-TRUE)\\
+  $\infer{\Gamma\vdash\false : Bool}{}$ &(T-FALSE)\\
+  $\infer{\tif\ t_1\ \tthen\ t_2\ \telse\ t_3 : T}{\Gamma\vdash t_1:\Bool &\Gamma\vdash t_2:T &\Gamma\vdash t_3:T}$ &(T-IF)\\
+  $\infer{\Gamma\vdash\unit : Unit}{}$ &(T-UNIT)\\
+  $\infer{\Gamma\vdash (t_1,t_2) : T_1\times T_2}{\Gamma\vdash t_1:T_1 &\Gamma\vdash t_2:T_2}$ &(T-PAIR)\\
+  $\infer{\Gamma\vdash t.1 : T_1}{\Gamma\vdash t : T_1\times T_2}$ &(T-FST)\\
+  $\infer{\Gamma\vdash t.2 : T_2}{\Gamma\vdash t : T_1\times T_2}$ &(T-SEC)\\
+\end{longtable}
 
 % \begin{longtable}[c]{cr}
 %   $\infer{\Gamma\vdash x:T}{x:T\in\Gamma &\Gamma\vdash T::*}$ &(T-VAR)\\
