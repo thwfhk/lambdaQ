@@ -1,0 +1,218 @@
+\documentclass[12pt]{article}
+
+\usepackage[a4paper]{geometry}
+\geometry{left=2.0cm,right=2.0cm,top=2.5cm,bottom=2.5cm}
+
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{diagbox}
+\usepackage{amsmath,amsfonts,graphicx,amssymb,bm,amsthm}
+\usepackage{algorithm,algorithmicx}
+\usepackage[noend]{algpseudocode}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{fontspec}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{newclude}
+
+%Includes "References" in the table of contents
+\usepackage[nottoc]{tocbibind}
+
+%Import the natbib package and sets a bibliography style
+\usepackage{natbib}
+
+\newfontfamily{\lstfont}[Scale=.85]{Fira Sans}
+
+\hypersetup{hidelinks}
+
+\bibliographystyle{abbrvnat}
+\usepackage{authblk}
+
+% write inference rules
+\usepackage{proof}
+\usepackage{semantic}
+\usepackage{mathpartir}
+
+\newtheorem{Def}{Definition}
+\newtheorem{Thm}{Theorem}
+\newtheorem{Prop}{Proposition}
+\newtheorem{Proof}{Proof}
+
+% \usepackage{listings}
+% \definecolor{light-gray}{gray}{0.85}
+% \lstdefinelanguage{lambda}{%
+%   morekeywords={%
+%     if,then,else,fix,fun % keywords go here
+%   },%
+%   morekeywords={[2]Nat,Bool,Vector},   % types go here
+%   otherkeywords={}, % operators go here
+%   literate={% replace strings with symbols
+%     {->}{{$\to$}}{2}
+%     {lambda}{{$\lambda$}}{1}
+%     {Pi}{{$\Pi$}}{1}
+%     {Sigma}{{$\Sigma$}}{1}
+%     {n1}{{$n_1$}}{1}
+%     {n2}{{$n_2$}}{1}
+%     {v1}{{$v_1$}}{1}
+%     {v2}{{$v_2$}}{1}
+%   },
+%   basicstyle={\lstfont}, 
+%   keywordstyle={\bfseries},
+%   keywordstyle={[2]\itshape}, % style for types
+%   keepspaces,
+%   mathescape, 
+%   columns=fixed,
+%   backgroundcolor = \color{light-gray}
+% }[keywords,comments,strings]
+
+
+\title{The Definition of $\lambda_Q$}
+\author{}
+% \affil{Department of EECS\\ Peking University}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\input{macro}
+
+\section{Syntax}
+
+\begin{longtable}[c]{lclr}
+  % \caption{syntax}
+  \label{tab:table1}\\
+  \toprule
+  $t$ &$::=$ &  &\textbf{terms}: \\
+      & &$x$ &variable\\
+      & &$\unit$ &constant unit\\
+      & &$\true$ &constant true\\
+      & &$\false$ &constant false\\
+      & &$\lambda\ x:T.t$ &function abstraction\\
+      & &$t\ t$ &function application\\
+      & &$(t, t)$ &pair\\
+      & &$t.1$ &first projection\\
+      & &$t.2$ &second projection\\
+      & &$\mathit{if}\ t\ \mathit{then}\ t\ \mathit{else}\ t$ &conditional\\
+      & &$\mathit{run}\ C$ &static lifting\\
+      & &$\zeta \ p:W . C$ &circuit abstraction\\
+      % & &0 &constant zero\\
+      % & &succ $t$ &successor\\
+      % & &pred $t$ &predecessor\\
+      % & &iszero $t$ & zero test\\
+  \\
+  
+  $v$ &$::=$ &  &\textbf{values}: \\
+      & &$\lambda\ x:T.t$ &abstraction value\\
+      & &$(v, v)$ &pair value\\
+      & &$\unit$ &unit value\\
+      & &$\true$ &true value\\
+      & &$\false$ &false value\\
+      & &$\zeta\ p:W . C$ &circuit value\\
+  \\
+
+  $T$ &$::=$ &  &\textbf{types}: \\
+      & &$\Unit$ &unit type\\
+      & &$\Bool$ &boolean type \\
+      & &$T\times T$ &product type\\
+      & &$T\to T$ &function type\\
+      & &$T\leadsto T$ &circuit type\\
+      % & &Nat &type of natural numbers\\
+      % & &Vector $t$ &type family of vectors\\
+  \\
+
+  $\Gamma$ &$::=$ &  &\textbf{contexts}: \\
+      & &$\varnothing$ &empty context\\
+      & &$\Gamma,x:T$ &term variable binding\\
+  \\
+
+
+  $W$ &$::=$ &  &\textbf{wire types}: \\
+      & &$One$ &wire unit type\\
+      & &$Bit$ &bit type \\
+      & &$Qubit$ &qubit type \\
+      & &$W \otimes W$ &wire product type \\
+  \\
+
+  $p$ &$::=$ &  &\textbf{wire patterns}: \\
+      & &$()$ &empty\\
+      & &$w$ &wire variable \\
+      & &$(p,p)$ &wire pair \\
+  \\
+
+  $C$ &$::=$ &  &\textbf{circuits}: \\
+      & &$\mathit{output}\ p$ &output a pattern \\
+      & &$p_2 \from \gate\ g\ p_1 ; C$ &gate application \\
+      & &$p \from C ; C$ &circuit composition \\
+      & &$x \From \lift\ p ; C$ &dynamic lifting \\
+      & &$\unbox\ t\ p$ &circuit application \\
+  \\
+
+  $\Omega$ &$::=$ &  &\textbf{wire contexts}: \\
+      & &$\varnothing$ &empty context\\
+      & &$\Omega,w:W$ &wire variable binding\\
+  \\
+  % TODO: add the condition of well-formed contexts
+
+  \bottomrule
+  
+\end{longtable}
+
+\section{Type Checking Rules}
+First, we need to define what is a well-formed wire context.
+\begin{Def}[Well-formed Wire Contexts]
+  A wire context $\Omega$ is well-formed, if there are no duplicate wire variables in it.
+  For simplicity, we always assume the wire contexts are well-formed in the following contexts. And when we write $\Omega_1, \Omega_2$, we require $\Omega_1$ and $\Omega_2$ to be disjoint to preserve the well-formedness.
+\end{Def}
+
+Since there are three different kinds of terms: ($\lambda$-)terms, wire patterns and circuits, we have three different relations for each of them to check the correctness.
+\begin{itemize}
+  \item $\Omega \Rightarrow p : W$ is used to check the well-formedness of patterns.
+  \item $\Gamma ; \Omega \vdash C : W$ is the typing relation for circuits;
+  \item $\Gamma \vdash t:T$ is the typing relation for ($\lambda$-)terms;
+\end{itemize}
+
+\noindent \textbf{Well-formed patterns}: $\boxed{\Omega \Rightarrow p : W}$
+
+\renewcommand\arraystretch{2.5}
+\begin{longtable}[c]{cr}
+  $ \infer{\varnothing \To ():One}{}$ & \\
+  $ \infer{w:W \To w:Wz}{}$ & \\
+  $ \infer{\Omega_1, \Omega_2 \Rightarrow (p_1,p_2):W_1\otimes W_2}{\Omega_1 \To p_1 : W_1  &\Omega_2 \To p_2 : W_2} $ & \\
+\end{longtable}
+
+\noindent \textbf{Typing rules for circuits}: $\boxed{\Gamma;\Omega\vdash C:W}$
+
+{\color{red} TODO: add typing rules for circuits.}
+
+% \begin{longtable}[c]{cr}
+%   $\infer{\Gamma\vdash x:T}{x:T\in\Gamma &\Gamma\vdash T::*}$ &(T-VAR)\\
+%   $\infer{\Gamma\vdash \lambda x:S.t\ :\Pi x:S.T}{\Gamma\vdash S::* &\Gamma,x:S\vdash t:T}$ &(T-ABS)\\
+%   $\infer{\Gamma \vdash t_1\ t_2 : [x\mapsto t_2]T}{\Gamma\vdash t_1:\Pi x:S.T &\Gamma\vdash t_2:S}$ &(T-APP)\\
+%   $\infer{\Gamma\vdash (t_1,t_2:\Sigma x:S.T)\ :\Sigma x:S.T}{\Gamma \vdash t_1:S &\Gamma\vdash t_2:[x\mapsto t_1]T}$ &(T-PAIR)\\
+%   $\infer{\Gamma\vdash t.1:S}{\Gamma\vdash t:\Sigma x:S.T}$ &(T-PROJ1)\\
+%   $\infer{\Gamma\vdash t.2:[x\mapsto t.1]T}{\Gamma\vdash t:\Sigma x:S.T}$ &(T-PROJ2)\\
+%   $\infer{\Gamma\vdash t:T'}{\Gamma\vdash t:T &\Gamma\vdash T\equiv T'::*}$ &(T-CONV)\\
+% \end{longtable}
+
+\noindent \textbf{Typing rules for ($\lambda$-)terms}: $\boxed{\Gamma\vdash t:T}$
+
+{\color{red} TODO: add typing rules for terms.}
+
+% \begin{longtable}[c]{cr}
+%   $\infer{\Gamma\vdash x:T}{x:T\in\Gamma &\Gamma\vdash T::*}$ &(T-VAR)\\
+%   $\infer{\Gamma\vdash \lambda x:S.t\ :\Pi x:S.T}{\Gamma\vdash S::* &\Gamma,x:S\vdash t:T}$ &(T-ABS)\\
+%   $\infer{\Gamma \vdash t_1\ t_2 : [x\mapsto t_2]T}{\Gamma\vdash t_1:\Pi x:S.T &\Gamma\vdash t_2:S}$ &(T-APP)\\
+%   $\infer{\Gamma\vdash (t_1,t_2:\Sigma x:S.T)\ :\Sigma x:S.T}{\Gamma \vdash t_1:S &\Gamma\vdash t_2:[x\mapsto t_1]T}$ &(T-PAIR)\\
+%   $\infer{\Gamma\vdash t.1:S}{\Gamma\vdash t:\Sigma x:S.T}$ &(T-PROJ1)\\
+%   $\infer{\Gamma\vdash t.2:[x\mapsto t.1]T}{\Gamma\vdash t:\Sigma x:S.T}$ &(T-PROJ2)\\
+%   $\infer{\Gamma\vdash t:T'}{\Gamma\vdash t:T &\Gamma\vdash T\equiv T'::*}$ &(T-CONV)\\
+% \end{longtable}
+
+\section{Operational Semantics}
+{\color{red} TODO: add semantics.}
+
+\end{document}
