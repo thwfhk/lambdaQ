@@ -1,0 +1,13 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "Frontend:lib"
+
+    - path: "./app/Main.hs"
+      component: "Frontend:exe:Frontend-exe"
+
+    - path: "./app/Paths_Frontend.hs"
+      component: "Frontend:exe:Frontend-exe"
+
+    - path: "./test"
+      component: "Frontend:test:Frontend-test"

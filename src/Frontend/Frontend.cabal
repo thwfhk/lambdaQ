@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 05095e460e6f54b1fc942110abcd14c66359461f824ad35286dd40250311d919
+-- hash: 70abefd53947551c969a0c8746f42c2a2758172a47f6e50b548be31d981e1ee4
 
 name:           Frontend
 version:        0.1.0.0
@@ -27,13 +27,17 @@ source-repository head
 
 library
   exposed-modules:
+      Lexer
       Lib
+      Parser
+      Syntax
   other-modules:
       Paths_Frontend
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , parsec
   default-language: Haskell2010
 
 executable Frontend-exe
@@ -46,6 +50,7 @@ executable Frontend-exe
   build-depends:
       Frontend
     , base >=4.7 && <5
+    , parsec
   default-language: Haskell2010
 
 test-suite Frontend-test
@@ -59,4 +64,5 @@ test-suite Frontend-test
   build-depends:
       Frontend
     , base >=4.7 && <5
+    , parsec
   default-language: Haskell2010

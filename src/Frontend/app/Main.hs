@@ -1,6 +1,12 @@
 module Main where
 
-import Lib
+import Lexer
+import Parser
 
 main :: IO ()
-main = someFunc
+main = do
+  prog <- getLine
+  putStrLn prog
+  case runMyParser prog of
+    Left err -> print err
+    Right term -> print term
