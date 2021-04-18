@@ -57,8 +57,8 @@ parseProj = do
 parsePrimTerm :: Parser Term
 parsePrimTerm 
   =  unit
- <|> trace "<processing true>" true
- <|> trace "<processing false>" false
+ <|> true
+ <|> false
  <|> parseIf
  <|> parseProd
 
