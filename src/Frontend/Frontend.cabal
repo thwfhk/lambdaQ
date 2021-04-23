@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 70abefd53947551c969a0c8746f42c2a2758172a47f6e50b548be31d981e1ee4
+-- hash: 2837e9c9740722b92f3b9c6ec6354d8ed9119066c155252fb10e9354e089b21c
 
 name:           Frontend
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Context
       Lexer
       Lib
       Parser

@@ -1,9 +1,11 @@
 module Lexer where
 
-import Text.Parsec.String (Parser)
+import Text.Parsec (Parsec)
 import Text.Parsec.Language (emptyDef)
 
 import qualified Text.Parsec.Token as Tok
+
+import Data.Functor.Identity ( Identity )
 
 langDef :: Tok.LanguageDef st
 langDef = emptyDef
@@ -25,34 +27,39 @@ langDef = emptyDef
             , "then"
             , "else"
             , "run"
+            , "Unit"
+            , "Bool"
             ]
 
-lexer :: Tok.TokenParser ()
+lexer :: Tok.GenTokenParser String u Identity
 lexer = Tok.makeTokenParser langDef
 
-comma :: Parser String
+comma :: Parsec String u String
 comma = Tok.comma lexer
 
-dot :: Parser String
+dot :: Parsec String u String
 dot = Tok.dot lexer
 
-colon :: Parser String
+colon :: Parsec String u String
 colon = Tok.colon lexer
 
-parens :: Parser a -> Parser a
+parens :: Parsec String u a -> Parsec String u a
 parens = Tok.parens lexer
 
+
+whiteSpace :: Parsec String u ()
+whiteSpace = Tok.whiteSpace lexer
 -- commaSep :: Parser a -> Parser [a]
 -- commaSep = Tok.commaSep lexer
 
 -- semiSep :: Parser a -> Parser [a]
 -- semiSep = Tok.semiSep lexer
 
-identifier :: Parser String
+identifier :: Parsec String u String
 identifier = Tok.identifier lexer
 
-reserved :: String -> Parser ()
+reserved :: String -> Parsec String u ()
 reserved = Tok.reserved lexer
 
-reservedOp :: String -> Parser ()
+reservedOp :: String -> Parsec String u ()
 reservedOp = Tok.reservedOp lexer

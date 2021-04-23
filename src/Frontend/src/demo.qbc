@@ -1,0 +1,2 @@
+(\ x : Bool * Bool . if x.1 then x.2 else false) (true, false)
+(\ x : Unit . \ y : Unit . x) unit unit

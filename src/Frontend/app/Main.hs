@@ -6,7 +6,9 @@ import Parser
 main :: IO ()
 main = do
   prog <- getLine
-  putStrLn prog
+  -- putStrLn prog
   case runMyParser prog of
     Left err -> print err
-    Right term -> print term
+    Right term -> putStrLn $ "[SUCCESS] " ++ show term
+  putStrLn ""
+  main

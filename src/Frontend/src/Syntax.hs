@@ -24,6 +24,3 @@ data Term
   -- TmRun Circ
   -- TmCir String
   deriving Show
-
-type Context = [(String, Type)]
-
