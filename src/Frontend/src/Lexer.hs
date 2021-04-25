@@ -19,6 +19,9 @@ langDef = emptyDef
           , "~>"
           , "\\" -- lambda
           , "/"  -- kappa
+          , "#" -- times
+          , "<-"
+          , "<="
           ]
     names = [ "unit"
             , "true"
@@ -29,6 +32,15 @@ langDef = emptyDef
             , "run"
             , "Unit"
             , "Bool"
+            , "One"
+            , "Bit"
+            , "Qubit"
+            , "output"
+            , "gate"
+            , "lift"
+            , "capp"
+            , "new0", "new1", "init0", "init1"
+            , "meas", "discard"
             ]
 
 lexer :: Tok.GenTokenParser String u Identity
@@ -42,6 +54,9 @@ dot = Tok.dot lexer
 
 colon :: Parsec String u String
 colon = Tok.colon lexer
+
+semi :: Parsec String u String
+semi = Tok.semi lexer
 
 parens :: Parsec String u a -> Parsec String u a
 parens = Tok.parens lexer

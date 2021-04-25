@@ -56,8 +56,10 @@ parseProj :: Parser (Term -> Term)
 parseProj = do
   dot
   num <- many1 digit
-  return $ \t -> if num == "1" then TmFst t else TmSnd t
--- TODO: how to throw a ParseError?
+  return $ \t -> case num of
+    "1" -> TmFst t
+    "2" -> TmSnd t
+    _ -> error "Product Index Error"
 
 parseVar :: Parser Term
 parseVar = do
@@ -71,13 +73,33 @@ parseAbs = do
   reservedOp "\\"
   var <- identifier
   colon
-  tyVar <- parseType
+  ty <- parseType
   dot
   ctx <- getState
-  setState $ addBinding ctx (var, VarBind tyVar)
+  setState $ addBinding ctx (var, VarBind ty)
   term <- parseTerm
   setState ctx
-  return $ TmAbs var tyVar term
+  return $ TmAbs var ty term
+
+parseRun :: Parser Term
+parseRun = do
+  reserved "run"
+  circ <- parseCirc
+  return $ TmRun circ
+
+parseCAbs :: Parser Term
+parseCAbs = do
+  reservedOp "/"
+  pat <- parsePattern
+  colon
+  wtype <- parseWtype
+  dot
+  ctx <- getState
+  -- TODO: need to travel through all wire variables in the pat
+  -- setState $ addBinding ctx (Wir pat, WireBind wtype)
+  circ <- parseCirc
+  setState ctx
+  return $ TmCir pat wtype circ
 
 parsePrimTerm :: Parser Term -- without projection
 parsePrimTerm = whiteSpace >> (
@@ -142,6 +164,89 @@ parseTypeExpr = Ex.buildExpressionParser typeOps parsePrimType
 
 parseType :: Parser Type
 parseType = whiteSpace >> parseTypeExpr
+
+----------------------------------------------------------------
+-- Parse Circuit
+parseOutput :: Parser Circ
+parseOutput = do
+  reserved "output"
+  pat <- parsePattern
+  return $ CcOutput pat
+
+parseGateApp :: Parser Circ
+parseGateApp = do
+  pat2 <- parsePattern
+  reservedOp "<-"
+  reserved "gate"
+  gate <- parseGate
+  pat1 <- parsePattern
+  semi
+  circ <- parseCirc
+  return $ CcGate pat2 gate pat1 circ
+
+parseComp :: Parser Circ
+parseComp = do
+  pat <- parsePattern
+  reservedOp "<-"
+  circ1 <- parseCirc
+  semi
+  circ2 <- parseCirc
+  return $ CcComp pat circ1 circ2
+
+-- TODO: not finished
+
+parseCirc :: Parser Circ
+parseCirc = whiteSpace >> (
+      parseOutput
+  <|> parseGateApp
+  <|> parseComp
+  <|> parens parseCirc
+  )
+
+----------------------------------------------------------------
+-- Parse Circuit Type
+parseOne :: Parser Wtype
+parseOne = reservedOp "One" >> return WtUnit
+
+parseBit :: Parser Wtype
+parseBit = reservedOp "Bit" >> return WtBit
+
+parseQubit :: Parser Wtype
+parseQubit = reservedOp "Qubit" >> return WtQubit
+
+parseWProd :: Parser Wtype
+parseWProd = do
+  w1 <- parseWtype
+  reservedOp "#"
+  w2 <- parseWtype
+  return $ WtProd w1 w2
+
+parseWtype :: Parser Wtype
+parseWtype = whiteSpace >> (
+      parseOne
+  <|> parseBit
+  <|> parseQubit
+  <|> parseWProd
+  <|> parens parseWtype
+  )
+
+----------------------------------------------------------------
+-- Parse Pattern
+
+parseWVar :: Parser Pattern
+parseWVar = do
+  var <- identifier
+  ctx <- getState
+  idx <- name2index ctx var
+  return $ PtVar idx (length ctx)
+
+parsePattern :: Parser Pattern
+parsePattern = error "No"
+
+----------------------------------------------------------------
+-- Parse Pattern
+parseGate :: Parser Gate
+parseGate = error "No"
 
 ----------------------------------------------------------------
 runMyParser :: String -> Either ParseError Term
