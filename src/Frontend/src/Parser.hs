@@ -80,24 +80,25 @@ parseAbs = do
   return $ TmAbs var tyVar term
 
 parsePrimTerm :: Parser Term -- without projection
-parsePrimTerm 
-  =  unit
- <|> true
- <|> false
- <|> parseIf
- <|> parseVar
- <|> parseAbs
- <|> try parseProd
- <|> parens parseTerm
+parsePrimTerm = whiteSpace >> (
+      unit
+  <|> true
+  <|> false
+  <|> parseIf
+  <|> parseVar
+  <|> parseAbs
+  <|> try parseProd
+  <|> parens parseTerm
+  )
 
 termOps :: [[Ex.Operator String Context Identity Term]]
 termOps = [ [Ex.Postfix parseProj] ]
 
 parseTermExpr :: Parser Term -- deal with projection
-parseTermExpr = Ex.buildExpressionParser termOps parsePrimTerm
+parseTermExpr = whiteSpace >> Ex.buildExpressionParser termOps parsePrimTerm
 
 parseTerm :: Parser Term -- all terms
-parseTerm = chainl1 parseTermExpr (return TmApp)
+parseTerm = whiteSpace >> chainl1 parseTermExpr (return TmApp)
 
 ----------------------------------------------------------------
 -- Parse Type
@@ -120,10 +121,11 @@ parseTyBool = do
 --   return $ TyProd t1 t2
 
 parsePrimType :: Parser Type
-parsePrimType
-   =  parseTyUnit
+parsePrimType = whiteSpace >> (
+      parseTyUnit
   <|> parseTyBool
   <|> parens parseType
+  )
 
 binary :: String -> (a -> a -> a) -> Ex.Assoc -> Ex.Operator String u Identity a
 binary s f assoc = Ex.Infix (reservedOp s >> return f) assoc
@@ -139,7 +141,7 @@ parseTypeExpr :: Parser Type
 parseTypeExpr = Ex.buildExpressionParser typeOps parsePrimType
 
 parseType :: Parser Type
-parseType = parseTypeExpr
+parseType = whiteSpace >> parseTypeExpr
 
 ----------------------------------------------------------------
 runMyParser :: String -> Either ParseError Term
