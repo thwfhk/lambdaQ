@@ -9,12 +9,13 @@ import qualified Text.Parsec.Expr as Ex
 import qualified Text.Parsec.Token as Tok
 
 import Data.Functor.Identity (Identity)
+import Control.Applicative (empty)
 
 import Lexer
 import Syntax
 import Context
 
-type Parser a = ParsecT String Context Identity a
+-- type Parser a = ParsecT String Context Identity a
 ----------------------------------------------------------------
 -- Parse Term
 
@@ -76,7 +77,7 @@ parseAbs = do
   ty <- parseType
   dot
   ctx <- getState
-  setState $ addBinding ctx (var, VarBind ty)
+  setState $ addBinding ctx var (VarBind ty)
   term <- parseTerm
   setState ctx
   return $ TmAbs var ty term
@@ -90,19 +91,19 @@ parseRun = do
 parseCAbs :: Parser Term
 parseCAbs = do
   reservedOp "/"
-  pat <- parsePattern
+  patvar <- parsePattern True
   colon
   wtype <- parseWtype
+  traceM $ "#####[WTYPE]: " ++ show wtype ++ " [END]#####"
   dot
   ctx <- getState
-  -- TODO: need to travel through all wire variables in the pat
-  -- setState $ addBinding ctx (Wir pat, WireBind wtype)
+  addPatBinding2State patvar wtype
   circ <- parseCirc
   setState ctx
-  return $ TmCir pat wtype circ
+  return $ TmCir patvar wtype circ
 
 parsePrimTerm :: Parser Term -- without projection
-parsePrimTerm = whiteSpace >> (
+parsePrimTerm = (whiteSpace >>) $
       unit
   <|> true
   <|> false
@@ -110,8 +111,9 @@ parsePrimTerm = whiteSpace >> (
   <|> parseVar
   <|> parseAbs
   <|> try parseProd
+  <|> parseRun
+  <|> parseCAbs
   <|> parens parseTerm
-  )
 
 termOps :: [[Ex.Operator String Context Identity Term]]
 termOps = [ [Ex.Postfix parseProj] ]
@@ -143,50 +145,45 @@ parseTyBool = do
 --   return $ TyProd t1 t2
 
 parsePrimType :: Parser Type
-parsePrimType = whiteSpace >> (
+parsePrimType = (whiteSpace >>) $
       parseTyUnit
   <|> parseTyBool
   <|> parens parseType
-  )
 
 binary :: String -> (a -> a -> a) -> Ex.Assoc -> Ex.Operator String u Identity a
 binary s f assoc = Ex.Infix (reservedOp s >> return f) assoc
 
 typeOps :: [[Ex.Operator String u Identity Type]]
-typeOps = [ [binary "*" TyProd Ex.AssocLeft]
-          , [binary "->" TyArr Ex.AssocRight]
-          ]
-        -- ,[binary "~>" TyCir Ex.AssocLeft,
-          -- binary "-" Minus Ex.AssocLeft]]
-
-parseTypeExpr :: Parser Type
-parseTypeExpr = Ex.buildExpressionParser typeOps parsePrimType
+typeOps = [ [ binary "*" TyProd Ex.AssocLeft ]
+          , [ binary "->" TyArr Ex.AssocRight
+            , binary "~>" TyCir Ex.AssocRight ] ]
 
 parseType :: Parser Type
-parseType = whiteSpace >> parseTypeExpr
+parseType = whiteSpace >> Ex.buildExpressionParser typeOps parsePrimType
 
 ----------------------------------------------------------------
--- Parse Circuit
+-- Parse Circuit 
+-- TODO: GateApp & Comp may be wrong
 parseOutput :: Parser Circ
 parseOutput = do
   reserved "output"
-  pat <- parsePattern
+  pat <- parsePattern False
   return $ CcOutput pat
 
 parseGateApp :: Parser Circ
 parseGateApp = do
-  pat2 <- parsePattern
+  pat2 <- parsePattern False -- should use True
   reservedOp "<-"
   reserved "gate"
   gate <- parseGate
-  pat1 <- parsePattern
+  pat1 <- parsePattern False
   semi
   circ <- parseCirc
   return $ CcGate pat2 gate pat1 circ
 
 parseComp :: Parser Circ
 parseComp = do
-  pat <- parsePattern
+  pat <- parsePattern False
   reservedOp "<-"
   circ1 <- parseCirc
   semi
@@ -196,12 +193,11 @@ parseComp = do
 -- TODO: not finished
 
 parseCirc :: Parser Circ
-parseCirc = whiteSpace >> (
+parseCirc = (whiteSpace >>) $
       parseOutput
-  <|> parseGateApp
-  <|> parseComp
+  <|> try parseGateApp
+  <|> try parseComp
   <|> parens parseCirc
-  )
 
 ----------------------------------------------------------------
 -- Parse Circuit Type
@@ -214,40 +210,84 @@ parseBit = reservedOp "Bit" >> return WtBit
 parseQubit :: Parser Wtype
 parseQubit = reservedOp "Qubit" >> return WtQubit
 
-parseWProd :: Parser Wtype
-parseWProd = do
-  w1 <- parseWtype
-  reservedOp "#"
-  w2 <- parseWtype
-  return $ WtProd w1 w2
-
-parseWtype :: Parser Wtype
-parseWtype = whiteSpace >> (
+parsePrimWtype :: Parser Wtype
+parsePrimWtype = (whiteSpace >>) $
       parseOne
   <|> parseBit
   <|> parseQubit
-  <|> parseWProd
   <|> parens parseWtype
-  )
+
+wtypeOps :: [[Ex.Operator String u Identity Wtype]]
+wtypeOps = [[binary "#" WtProd Ex.AssocLeft]]
+
+parseWtype :: Parser Wtype
+parseWtype = whiteSpace >> Ex.buildExpressionParser wtypeOps parsePrimWtype
+
 
 ----------------------------------------------------------------
 -- Parse Pattern
 
-parseWVar :: Parser Pattern
-parseWVar = do
+parseWVar :: Bool -> Parser Pattern
+parseWVar b = do
   var <- identifier
-  ctx <- getState
-  idx <- name2index ctx var
-  return $ PtVar idx (length ctx)
+  if b then
+    return $ PtName var
+  else do
+    ctx <- getState
+    idx <- name2index ctx var
+    return $ PtVar idx (length ctx)
 
-parsePattern :: Parser Pattern
-parsePattern = error "No"
+parseEmpty :: Bool -> Parser Pattern
+parseEmpty b = do
+  reservedOp "()"
+  return PtEmp
+
+parsePProd :: Bool -> Parser Pattern
+parsePProd b = parens $ do
+  p1 <- parsePattern b
+  comma
+  p2 <- parsePattern b
+  return $ PtProd p1 p2
+
+-- | Parse a Pattern
+-- True: use string name
+-- False: use Debruijn Index
+parsePattern :: Bool -> Parser Pattern
+parsePattern b = (whiteSpace >>) $
+      parseWVar b
+  <|> try (parseEmpty b)
+  <|> try (parsePProd b)
 
 ----------------------------------------------------------------
--- Parse Pattern
+-- Parse Gate
+
+-- parseNew0 :: Parser Gate
+-- parseNew0 = reserved "new0" >> return GtNew0
+
+-- parseNew1 :: Parser Gate
+-- parseNew1 = reserved "new1" >> return GtNew1
+
+-- parseInit0 :: Parser Gate
+-- parseInit0 = reserved "init0" >> return GtInit0
+
+-- parseInit1 :: Parser Gate
+-- parseInit1 = reserved "init1" >> return GtInit1
+
+-- parseMeas :: Parser Gate
+-- parseMeas = reserved "meas" >> return GtMeas
+
+-- parseDiscard :: Parser Gate
+-- parseDiscard = reserved "discard" >> return GtDiscard
+
 parseGate :: Parser Gate
-parseGate = error "No"
+parseGate = foldl (\p s -> p <|> (reserved s >> return (Gt s))) empty gateNames
 
 ----------------------------------------------------------------
 runMyParser :: String -> Either ParseError Term
 runMyParser = runParser parseTerm emptyctx "<CandyQwQ>" 
+
+-- runMyParser :: String -> Either ParseError Wtype
+-- runMyParser = runParser parseWtype emptyctx "<CandyQwQ>" 
+
+-- runMyParser :: String -> Either ParseError Type
+-- runMyParser = runParser parseType emptyctx "<CandyQwQ>" 

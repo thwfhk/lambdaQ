@@ -7,9 +7,11 @@ import qualified Text.Parsec.Token as Tok
 
 import Data.Functor.Identity ( Identity )
 
+import Syntax
+
 langDef :: Tok.LanguageDef st
 langDef = emptyDef
-    { Tok.commentLine = "#"
+    { Tok.commentLine = "QwQ"
     , Tok.reservedOpNames = ops
     , Tok.reservedNames = names
     }
@@ -22,6 +24,7 @@ langDef = emptyDef
           , "#" -- times
           , "<-"
           , "<="
+          , "()"
           ]
     names = [ "unit"
             , "true"
@@ -39,9 +42,7 @@ langDef = emptyDef
             , "gate"
             , "lift"
             , "capp"
-            , "new0", "new1", "init0", "init1"
-            , "meas", "discard"
-            ]
+            ] ++ gateNames
 
 lexer :: Tok.GenTokenParser String u Identity
 lexer = Tok.makeTokenParser langDef

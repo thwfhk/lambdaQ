@@ -39,16 +39,15 @@ data Wtype
   deriving Show
 
 data Pattern
-  = PtVar Int Int
+  = PtVar Int Int -- De Bruijn Index
+  | PtName String -- Name
   | PtEmp
   | PtProd Pattern Pattern
   deriving (Show, Eq)
 
-data Gate
-  = GtNew0
-  | GtNew1
-  | GtInit0
-  | GtInit1
-  | GtMeas
-  | GtDiscard
+data Gate = Gt String
+  -- = GtNew0 | GtNew1 | GtInit0 | GtInit1 | GtMeas | GtDiscard
   deriving Show
+
+gateNames :: [String]
+gateNames = ["new0", "new1", "init0", "init1", "meas", "discard"]
