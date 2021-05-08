@@ -1,11 +1,13 @@
 module Syntax where
 
+import Data.List
+
 data Type
   = TyUnit
   | TyBool
   | TyProd Type Type
   | TyArr Type Type
-  | TyCir Type Type
+  | TyCir Wtype Wtype
   deriving Show
 
 data Term
@@ -49,5 +51,21 @@ data Gate = Gt String
   -- = GtNew0 | GtNew1 | GtInit0 | GtInit1 | GtMeas | GtDiscard
   deriving Show
 
+gateInfos :: [(String, Wtype, Wtype)]
+gateInfos =
+  [ ("new0", WtUnit, WtBit)
+  , ("new1", WtUnit, WtBit)
+  , ("init0", WtUnit, WtQubit)
+  , ("init1", WtUnit, WtQubit)
+  , ("meas", WtQubit, WtBit)
+  , ("discard", WtBit, WtUnit)
+  , ("H", WtQubit, WtQubit)
+  ]
+
 gateNames :: [String]
-gateNames = ["new0", "new1", "init0", "init1", "meas", "discard"]
+gateNames = map (\(a, _, _) -> a) gateInfos
+
+getGateWtype :: Gate-> Wtype
+getGateWtype (Gt s) = case (find (\(a, _, _) -> a == s) gateInfos) of
+  Nothing -> error $ "getGateWtype: gate " ++ s ++ " not defined" 
+  Just (_, _, c) -> c

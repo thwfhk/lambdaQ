@@ -97,7 +97,7 @@ parseCAbs = do
   traceM $ "#####[WTYPE]: " ++ show wtype ++ " [END]#####"
   dot
   ctx <- getState
-  addPatBinding2State patvar wtype
+  addPatWtypeBinding patvar wtype
   circ <- parseCirc
   setState ctx
   return $ TmCir patvar wtype circ
@@ -137,17 +137,18 @@ parseTyBool = do
   reserved "Bool"
   return TyBool
 
--- parseTyProd :: Parser Type
--- parseTyProd = parens $ do
---   t1 <- parseType
---   comma
---   t2 <- parseType
---   return $ TyProd t1 t2
+parseTyCir :: Parser Type
+parseTyCir = do
+  t1 <- parseWtype
+  reservedOp "~>"
+  t2 <- parseWtype
+  return $ TyCir t1 t2
 
 parsePrimType :: Parser Type
 parsePrimType = (whiteSpace >>) $
       parseTyUnit
   <|> parseTyBool
+  <|> parseTyCir
   <|> parens parseType
 
 binary :: String -> (a -> a -> a) -> Ex.Assoc -> Ex.Operator String u Identity a
@@ -155,15 +156,14 @@ binary s f assoc = Ex.Infix (reservedOp s >> return f) assoc
 
 typeOps :: [[Ex.Operator String u Identity Type]]
 typeOps = [ [ binary "*" TyProd Ex.AssocLeft ]
-          , [ binary "->" TyArr Ex.AssocRight
-            , binary "~>" TyCir Ex.AssocRight ] ]
+          , [ binary "->" TyArr Ex.AssocRight] ]
+            -- , binary "~>" TyCir Ex.AssocRight ] ]
 
 parseType :: Parser Type
 parseType = whiteSpace >> Ex.buildExpressionParser typeOps parsePrimType
 
 ----------------------------------------------------------------
 -- Parse Circuit 
--- TODO: GateApp & Comp may be wrong
 parseOutput :: Parser Circ
 parseOutput = do
   reserved "output"
@@ -172,29 +172,44 @@ parseOutput = do
 
 parseGateApp :: Parser Circ
 parseGateApp = do
-  pat2 <- parsePattern False -- should use True
+  pat2 <- parsePattern True
   reservedOp "<-"
   reserved "gate"
   gate <- parseGate
   pat1 <- parsePattern False
   semi
+  ctx <- getState
+  addPatNameBinding pat2
   circ <- parseCirc
+  setState ctx
   return $ CcGate pat2 gate pat1 circ
 
 parseComp :: Parser Circ
 parseComp = do
-  pat <- parsePattern False
+  pat <- parsePattern True
   reservedOp "<-"
   circ1 <- parseCirc
   semi
+  ctx <- getState
+  addPatNameBinding pat
   circ2 <- parseCirc
   return $ CcComp pat circ1 circ2
+
+-- TODO: buggy
+parseCapp :: Parser Circ
+parseCapp = do
+  reserved "capp"
+  t <- parseTerm
+  traceM $ "Hi " ++ show t
+  p <- parsePattern False
+  return $ CcApp t p
 
 -- TODO: not finished
 
 parseCirc :: Parser Circ
 parseCirc = (whiteSpace >>) $
       parseOutput
+  <|> parseCapp
   <|> try parseGateApp
   <|> try parseComp
   <|> parens parseCirc
