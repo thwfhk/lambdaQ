@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2d15da547f96d2ed587705048dc3c98ced222d7a76e444ad1569398926f05d21
+-- hash: f5493bd859f52a73eebc3b61febf9bd153dfb58c371564a89f984e99e2086d70
 
 name:           Frontend
 version:        0.1.0.0
@@ -32,7 +32,7 @@ library
       Lib
       Parser
       Syntax
-      Typechecker
+      TypeChecker
   other-modules:
       Paths_Frontend
   hs-source-dirs:

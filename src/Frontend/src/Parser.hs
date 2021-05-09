@@ -16,6 +16,16 @@ import Syntax
 import Context
 
 -- type Parser a = ParsecT String Context Identity a
+
+getFst :: Parser Context
+getFst = fst <$> getState
+getSnd :: Parser Context
+getSnd = fst <$> getState
+setFst :: Context -> Parser ()
+setFst ctx = getState >>= \(_, omega) -> setState (ctx, omega)
+setSnd :: Context -> Parser ()
+setSnd ctx = getState >>= \(gamma, _) -> setState (gamma, ctx)
+
 ----------------------------------------------------------------
 -- Parse Term
 
@@ -65,9 +75,10 @@ parseProj = do
 parseVar :: Parser Term
 parseVar = do
   var <- identifier
-  ctx <- getState
-  let idx = name2index ctx var
-  return $ TmVar idx (length ctx)
+  ctx <- getFst
+  case name2index ctx var of
+    Right idx -> return $ TmVar idx (length ctx)
+    Left e -> error e
 
 parseAbs :: Parser Term
 parseAbs = do
@@ -76,10 +87,10 @@ parseAbs = do
   colon
   ty <- parseType
   dot
-  ctx <- getState
-  setState $ addBinding ctx (var, VarBind ty)
+  ctx <- getFst
+  setFst $ addBinding ctx (var, VarBind ty)
   term <- parseTerm
-  setState ctx
+  setFst ctx
   return $ TmAbs var ty term
 
 parseRun :: Parser Term
@@ -91,15 +102,17 @@ parseRun = do
 parseCAbs :: Parser Term
 parseCAbs = do
   reservedOp "/"
-  patvar <- parsePattern True
+  patvar <- parsePattern
   colon
   wtype <- parseWtype
   traceM $ "#####[WTYPE]: " ++ show wtype ++ " [END]#####"
   dot
-  ctx <- getState
-  addPatWtypeBindingP (patvar, wtype)
+  ctx <- getSnd
+  case addPatNameBinding ctx patvar of
+    Right ctx' -> setSnd ctx'
+    Left e -> error e
   circ <- parseCirc
-  setState ctx
+  setSnd ctx
   return $ TmCir patvar wtype circ
 
 parsePrimTerm :: Parser Term -- without projection
@@ -115,14 +128,14 @@ parsePrimTerm = (whiteSpace >>) $
   <|> parseCAbs
   <|> parens parseTerm
 
-termOps :: [[Ex.Operator String Context Identity Term]]
+termOps :: [[Ex.Operator String Contexts Identity Term]]
 termOps = [ [Ex.Postfix parseProj] ]
 
 parseTermExpr :: Parser Term -- deal with projection
 parseTermExpr = whiteSpace >> Ex.buildExpressionParser termOps parsePrimTerm
 
 parseTerm :: Parser Term -- all terms
-parseTerm = whiteSpace >> chainl1 parseTermExpr (return TmApp)
+parseTerm = whiteSpace >> chainl1 (try parseTermExpr) (return TmApp)
 
 ----------------------------------------------------------------
 -- Parse Type
@@ -148,7 +161,7 @@ parsePrimType :: Parser Type
 parsePrimType = (whiteSpace >>) $
       parseTyUnit
   <|> parseTyBool
-  <|> parseTyCir
+  <|> try parseTyCir
   <|> parens parseType
 
 binary :: String -> (a -> a -> a) -> Ex.Assoc -> Ex.Operator String u Identity a
@@ -167,41 +180,45 @@ parseType = whiteSpace >> Ex.buildExpressionParser typeOps parsePrimType
 parseOutput :: Parser Circ
 parseOutput = do
   reserved "output"
-  pat <- parsePattern False
+  pat <- parsePattern
   return $ CcOutput pat
 
 parseGateApp :: Parser Circ
 parseGateApp = do
-  pat2 <- parsePattern True
+  pat2 <- parsePattern
   reservedOp "<-"
   reserved "gate"
   gate <- parseGate
-  pat1 <- parsePattern False
+  pat1 <- parsePattern
   semi
-  ctx <- getState
-  addPatNameBindingP pat2
+  ctx <- getSnd
+  case addPatNameBinding ctx pat2 of
+    Right ctx' -> setSnd ctx'
+    Left e -> error e
   circ <- parseCirc
-  setState ctx
+  setSnd ctx
   return $ CcGate pat2 gate pat1 circ
 
 parseComp :: Parser Circ
 parseComp = do
-  pat <- parsePattern True
+  pat <- parsePattern
   reservedOp "<-"
   circ1 <- parseCirc
   semi
-  ctx <- getState
-  addPatNameBindingP pat
+  ctx <- getSnd
+  case addPatNameBinding ctx pat of
+    Right ctx' -> setSnd ctx'
+    Left e -> error e
   circ2 <- parseCirc
+  setSnd ctx
   return $ CcComp pat circ1 circ2
 
--- TODO: buggy
 parseCapp :: Parser Circ
 parseCapp = do
   reserved "capp"
   t <- parseTerm
   reserved "to"
-  p <- parsePattern False
+  p <- parsePattern
   return $ CcApp t p
 
 -- TODO: not finished
@@ -248,9 +265,10 @@ parseWVar b = do
   if b then
     return $ PtName var
   else do
-    ctx <- getState
-    let idx = name2index ctx var
-    return $ PtVar idx (length ctx)
+    ctx <- getSnd
+    case name2index ctx var of
+      Right idx -> return $ PtVar idx (length ctx)
+      Left e -> error e
 
 parseEmpty :: Bool -> Parser Pattern
 parseEmpty b = do
@@ -259,19 +277,19 @@ parseEmpty b = do
 
 parsePProd :: Bool -> Parser Pattern
 parsePProd b = parens $ do
-  p1 <- parsePattern b
+  p1 <- parsePattern
   comma
-  p2 <- parsePattern b
+  p2 <- parsePattern
   return $ PtProd p1 p2
 
 -- | Parse a Pattern
 -- True: use string name
 -- False: use Debruijn Index
-parsePattern :: Bool -> Parser Pattern
-parsePattern b = (whiteSpace >>) $
-      parseWVar b
-  <|> try (parseEmpty b)
-  <|> try (parsePProd b)
+parsePattern :: Parser Pattern
+parsePattern = (whiteSpace >>) $
+      parseWVar True
+  <|> try (parseEmpty True)
+  <|> try (parsePProd True)
 
 ----------------------------------------------------------------
 -- Parse Gate
@@ -299,7 +317,7 @@ parseGate = foldl (\p s -> p <|> (reserved s >> return (Gt s))) empty gateNames
 
 ----------------------------------------------------------------
 runMyParser :: String -> Either ParseError Term
-runMyParser = runParser parseTerm emptyctx "<CandyQwQ>" 
+runMyParser = runParser parseTerm emptyctxs "<CandyQwQ>" 
 
 -- runMyParser :: String -> Either ParseError Wtype
 -- runMyParser = runParser parseWtype emptyctx "<CandyQwQ>" 
