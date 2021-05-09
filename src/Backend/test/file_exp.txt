@@ -1,0 +1,4 @@
+openqasm 1.3;
+(1*(-intersting+3)/6^4),
+2/1*3+pi/2.34,
+sin(pi)+tan(1+2.3/4)+ln(a+x)

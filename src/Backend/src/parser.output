@@ -1,0 +1,1704 @@
+语法
+
+    0 $accept: start $end
+
+    1 start: mainprogram
+    2      | INCLUDE mainprogram
+
+    3 mainprogram: OPENQASM REAL SEMICOLON program
+
+    4 program: statement
+    5        | program statement
+
+    6 statement: decl
+    7          | gatedecl goplist RCPAREN
+    8          | gatedecl RCPAREN
+    9          | OPAQUE ID idlist SEMICOLON
+   10          | OPAQUE ID LPAREN RPAREN idlist SEMICOLON
+   11          | OPAQUE ID LPAREN idlist RPAREN idlist SEMICOLON
+   12          | qop
+   13          | IF LPAREN ID EQUAL NNINTEGER RPAREN qop
+   14          | BARRIER anylist SEMICOLON
+
+   15 decl: QREG ID LSPAREN NNINTEGER RSPAREN SEMICOLON
+   16     | CREG ID LSPAREN NNINTEGER RSPAREN SEMICOLON
+
+   17 exp: PI
+   18    | ID
+   19    | NNINTEGER
+   20    | REAL
+   21    | exp MINUS exp
+   22    | exp TIMES exp
+   23    | exp DIVIDE exp
+   24    | exp PLUS exp
+   25    | exp POWER exp
+   26    | MINUS exp
+   27    | LPAREN exp RPAREN
+   28    | unaryop LPAREN exp RPAREN
+
+   29 unaryop: SIN
+   30        | COS
+   31        | TAN
+   32        | EXP
+   33        | LN
+   34        | SQRT
+
+   35 explist: exp
+   36        | explist COMMA exp
+
+   37 argument: ID
+   38         | ID LSPAREN NNINTEGER RSPAREN
+
+   39 idlist: ID
+   40       | idlist COMMA ID
+
+   41 mixedlist: ID LSPAREN NNINTEGER RSPAREN
+   42          | mixedlist COMMA ID
+   43          | mixedlist COMMA ID LSPAREN NNINTEGER RSPAREN
+   44          | idlist COMMA ID LSPAREN NNINTEGER RSPAREN
+
+   45 anylist: idlist
+   46        | mixedlist
+
+   47 uop: U LPAREN explist RPAREN argument SEMICOLON
+   48    | CX argument COMMA argument SEMICOLON
+   49    | ID anylist SEMICOLON
+   50    | ID LPAREN RPAREN anylist SEMICOLON
+   51    | ID LPAREN explist RPAREN anylist SEMICOLON
+
+   52 qop: uop
+   53    | MEASURE argument ARROW argument SEMICOLON
+   54    | RESET argument SEMICOLON
+
+   55 goplist: uop
+   56        | BARRIER idlist SEMICOLON
+   57        | goplist uop
+   58        | goplist BARRIER idlist SEMICOLON
+
+   59 gatedecl: GATE ID idlist LCPAREN
+   60         | GATE ID LPAREN RPAREN idlist LCPAREN
+   61         | GATE ID LPAREN idlist RPAREN idlist LCPAREN
+
+
+终结语词，附有它们出现处的规则
+
+    $end (0) 0
+    error (256)
+    QREG (258) 15
+    CREG (259) 16
+    BARRIER (260) 14 56 58
+    GATE (261) 59 60 61
+    MEASURE (262) 53
+    RESET (263) 54
+    INCLUDE (264) 2
+    OPAQUE (265) 9 10 11
+    IF (266) 13
+    SIN (267) 29
+    COS (268) 30
+    TAN (269) 31
+    EXP (270) 32
+    LN (271) 33
+    SQRT (272) 34
+    PI (273) 17
+    SEMICOLON (274) 3 9 10 11 14 15 16 47 48 49 50 51 53 54 56 58
+    COMMA (275) 36 40 42 43 44 48
+    LSPAREN (276) 15 16 38 41 43 44
+    RSPAREN (277) 15 16 38 41 43 44
+    LCPAREN (278) 59 60 61
+    RCPAREN (279) 7 8
+    EQUAL (280) 13
+    ARROW (281) 53
+    PLUS (282) 24
+    MINUS (283) 21 26
+    TIMES (284) 22
+    DIVIDE (285) 23
+    POWER (286) 25
+    LPAREN (287) 10 11 13 27 28 47 50 51 60 61
+    RPAREN (288) 10 11 13 27 28 47 50 51 60 61
+    REAL (289) 3 20
+    NNINTEGER (290) 13 15 16 19 38 41 43 44
+    ID (291) 9 10 11 13 15 16 18 37 38 39 40 41 42 43 44 49 50 51 59 60 61
+    OPENQASM (292) 3
+    U (293) 47
+    CX (294) 48
+    UMINUS (295)
+
+
+非终结语词，附有它们出现处的规则
+
+    $accept (41)
+        on left: 0
+    start (42)
+        on left: 1 2
+        on right: 0
+    mainprogram (43)
+        on left: 3
+        on right: 1 2
+    program (44)
+        on left: 4 5
+        on right: 3 5
+    statement (45)
+        on left: 6 7 8 9 10 11 12 13 14
+        on right: 4 5
+    decl (46)
+        on left: 15 16
+        on right: 6
+    exp (47)
+        on left: 17 18 19 20 21 22 23 24 25 26 27 28
+        on right: 21 22 23 24 25 26 27 28 35 36
+    unaryop (48)
+        on left: 29 30 31 32 33 34
+        on right: 28
+    explist (49)
+        on left: 35 36
+        on right: 36 47 51
+    argument (50)
+        on left: 37 38
+        on right: 47 48 53 54
+    idlist (51)
+        on left: 39 40
+        on right: 9 10 11 40 44 45 56 58 59 60 61
+    mixedlist (52)
+        on left: 41 42 43 44
+        on right: 42 43 46
+    anylist (53)
+        on left: 45 46
+        on right: 14 49 50 51
+    uop (54)
+        on left: 47 48 49 50 51
+        on right: 52 55 57
+    qop (55)
+        on left: 52 53 54
+        on right: 12 13
+    goplist (56)
+        on left: 55 56 57 58
+        on right: 7 57 58
+    gatedecl (57)
+        on left: 59 60 61
+        on right: 7 8
+
+
+状态 0
+
+    0 $accept: • start $end
+
+    INCLUDE   偏移，并进入状态 1
+    OPENQASM  偏移，并进入状态 2
+
+    start        转到状态 3
+    mainprogram  转到状态 4
+
+
+状态 1
+
+    2 start: INCLUDE • mainprogram
+
+    OPENQASM  偏移，并进入状态 2
+
+    mainprogram  转到状态 5
+
+
+状态 2
+
+    3 mainprogram: OPENQASM • REAL SEMICOLON program
+
+    REAL  偏移，并进入状态 6
+
+
+状态 3
+
+    0 $accept: start • $end
+
+    $end  偏移，并进入状态 7
+
+
+状态 4
+
+    1 start: mainprogram •
+
+    $default  使用规则 1 以归约 (start)
+
+
+状态 5
+
+    2 start: INCLUDE mainprogram •
+
+    $default  使用规则 2 以归约 (start)
+
+
+状态 6
+
+    3 mainprogram: OPENQASM REAL • SEMICOLON program
+
+    SEMICOLON  偏移，并进入状态 8
+
+
+状态 7
+
+    0 $accept: start $end •
+
+    $default  接受
+
+
+状态 8
+
+    3 mainprogram: OPENQASM REAL SEMICOLON • program
+
+    QREG     偏移，并进入状态 9
+    CREG     偏移，并进入状态 10
+    BARRIER  偏移，并进入状态 11
+    GATE     偏移，并进入状态 12
+    MEASURE  偏移，并进入状态 13
+    RESET    偏移，并进入状态 14
+    OPAQUE   偏移，并进入状态 15
+    IF       偏移，并进入状态 16
+    ID       偏移，并进入状态 17
+    U        偏移，并进入状态 18
+    CX       偏移，并进入状态 19
+
+    program    转到状态 20
+    statement  转到状态 21
+    decl       转到状态 22
+    uop        转到状态 23
+    qop        转到状态 24
+    gatedecl   转到状态 25
+
+
+状态 9
+
+   15 decl: QREG • ID LSPAREN NNINTEGER RSPAREN SEMICOLON
+
+    ID  偏移，并进入状态 26
+
+
+状态 10
+
+   16 decl: CREG • ID LSPAREN NNINTEGER RSPAREN SEMICOLON
+
+    ID  偏移，并进入状态 27
+
+
+状态 11
+
+   14 statement: BARRIER • anylist SEMICOLON
+
+    ID  偏移，并进入状态 28
+
+    idlist     转到状态 29
+    mixedlist  转到状态 30
+    anylist    转到状态 31
+
+
+状态 12
+
+   59 gatedecl: GATE • ID idlist LCPAREN
+   60         | GATE • ID LPAREN RPAREN idlist LCPAREN
+   61         | GATE • ID LPAREN idlist RPAREN idlist LCPAREN
+
+    ID  偏移，并进入状态 32
+
+
+状态 13
+
+   53 qop: MEASURE • argument ARROW argument SEMICOLON
+
+    ID  偏移，并进入状态 33
+
+    argument  转到状态 34
+
+
+状态 14
+
+   54 qop: RESET • argument SEMICOLON
+
+    ID  偏移，并进入状态 33
+
+    argument  转到状态 35
+
+
+状态 15
+
+    9 statement: OPAQUE • ID idlist SEMICOLON
+   10          | OPAQUE • ID LPAREN RPAREN idlist SEMICOLON
+   11          | OPAQUE • ID LPAREN idlist RPAREN idlist SEMICOLON
+
+    ID  偏移，并进入状态 36
+
+
+状态 16
+
+   13 statement: IF • LPAREN ID EQUAL NNINTEGER RPAREN qop
+
+    LPAREN  偏移，并进入状态 37
+
+
+状态 17
+
+   49 uop: ID • anylist SEMICOLON
+   50    | ID • LPAREN RPAREN anylist SEMICOLON
+   51    | ID • LPAREN explist RPAREN anylist SEMICOLON
+
+    LPAREN  偏移，并进入状态 38
+    ID      偏移，并进入状态 28
+
+    idlist     转到状态 29
+    mixedlist  转到状态 30
+    anylist    转到状态 39
+
+
+状态 18
+
+   47 uop: U • LPAREN explist RPAREN argument SEMICOLON
+
+    LPAREN  偏移，并进入状态 40
+
+
+状态 19
+
+   48 uop: CX • argument COMMA argument SEMICOLON
+
+    ID  偏移，并进入状态 33
+
+    argument  转到状态 41
+
+
+状态 20
+
+    3 mainprogram: OPENQASM REAL SEMICOLON program •
+    5 program: program • statement
+
+    QREG     偏移，并进入状态 9
+    CREG     偏移，并进入状态 10
+    BARRIER  偏移，并进入状态 11
+    GATE     偏移，并进入状态 12
+    MEASURE  偏移，并进入状态 13
+    RESET    偏移，并进入状态 14
+    OPAQUE   偏移，并进入状态 15
+    IF       偏移，并进入状态 16
+    ID       偏移，并进入状态 17
+    U        偏移，并进入状态 18
+    CX       偏移，并进入状态 19
+
+    $default  使用规则 3 以归约 (mainprogram)
+
+    statement  转到状态 42
+    decl       转到状态 22
+    uop        转到状态 23
+    qop        转到状态 24
+    gatedecl   转到状态 25
+
+
+状态 21
+
+    4 program: statement •
+
+    $default  使用规则 4 以归约 (program)
+
+
+状态 22
+
+    6 statement: decl •
+
+    $default  使用规则 6 以归约 (statement)
+
+
+状态 23
+
+   52 qop: uop •
+
+    $default  使用规则 52 以归约 (qop)
+
+
+状态 24
+
+   12 statement: qop •
+
+    $default  使用规则 12 以归约 (statement)
+
+
+状态 25
+
+    7 statement: gatedecl • goplist RCPAREN
+    8          | gatedecl • RCPAREN
+
+    BARRIER  偏移，并进入状态 43
+    RCPAREN  偏移，并进入状态 44
+    ID       偏移，并进入状态 17
+    U        偏移，并进入状态 18
+    CX       偏移，并进入状态 19
+
+    uop      转到状态 45
+    goplist  转到状态 46
+
+
+状态 26
+
+   15 decl: QREG ID • LSPAREN NNINTEGER RSPAREN SEMICOLON
+
+    LSPAREN  偏移，并进入状态 47
+
+
+状态 27
+
+   16 decl: CREG ID • LSPAREN NNINTEGER RSPAREN SEMICOLON
+
+    LSPAREN  偏移，并进入状态 48
+
+
+状态 28
+
+   39 idlist: ID •
+   41 mixedlist: ID • LSPAREN NNINTEGER RSPAREN
+
+    LSPAREN  偏移，并进入状态 49
+
+    $default  使用规则 39 以归约 (idlist)
+
+
+状态 29
+
+   40 idlist: idlist • COMMA ID
+   44 mixedlist: idlist • COMMA ID LSPAREN NNINTEGER RSPAREN
+   45 anylist: idlist •
+
+    COMMA  偏移，并进入状态 50
+
+    $default  使用规则 45 以归约 (anylist)
+
+
+状态 30
+
+   42 mixedlist: mixedlist • COMMA ID
+   43          | mixedlist • COMMA ID LSPAREN NNINTEGER RSPAREN
+   46 anylist: mixedlist •
+
+    COMMA  偏移，并进入状态 51
+
+    $default  使用规则 46 以归约 (anylist)
+
+
+状态 31
+
+   14 statement: BARRIER anylist • SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 52
+
+
+状态 32
+
+   59 gatedecl: GATE ID • idlist LCPAREN
+   60         | GATE ID • LPAREN RPAREN idlist LCPAREN
+   61         | GATE ID • LPAREN idlist RPAREN idlist LCPAREN
+
+    LPAREN  偏移，并进入状态 53
+    ID      偏移，并进入状态 54
+
+    idlist  转到状态 55
+
+
+状态 33
+
+   37 argument: ID •
+   38         | ID • LSPAREN NNINTEGER RSPAREN
+
+    LSPAREN  偏移，并进入状态 56
+
+    $default  使用规则 37 以归约 (argument)
+
+
+状态 34
+
+   53 qop: MEASURE argument • ARROW argument SEMICOLON
+
+    ARROW  偏移，并进入状态 57
+
+
+状态 35
+
+   54 qop: RESET argument • SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 58
+
+
+状态 36
+
+    9 statement: OPAQUE ID • idlist SEMICOLON
+   10          | OPAQUE ID • LPAREN RPAREN idlist SEMICOLON
+   11          | OPAQUE ID • LPAREN idlist RPAREN idlist SEMICOLON
+
+    LPAREN  偏移，并进入状态 59
+    ID      偏移，并进入状态 54
+
+    idlist  转到状态 60
+
+
+状态 37
+
+   13 statement: IF LPAREN • ID EQUAL NNINTEGER RPAREN qop
+
+    ID  偏移，并进入状态 61
+
+
+状态 38
+
+   50 uop: ID LPAREN • RPAREN anylist SEMICOLON
+   51    | ID LPAREN • explist RPAREN anylist SEMICOLON
+
+    SIN        偏移，并进入状态 62
+    COS        偏移，并进入状态 63
+    TAN        偏移，并进入状态 64
+    EXP        偏移，并进入状态 65
+    LN         偏移，并进入状态 66
+    SQRT       偏移，并进入状态 67
+    PI         偏移，并进入状态 68
+    MINUS      偏移，并进入状态 69
+    LPAREN     偏移，并进入状态 70
+    RPAREN     偏移，并进入状态 71
+    REAL       偏移，并进入状态 72
+    NNINTEGER  偏移，并进入状态 73
+    ID         偏移，并进入状态 74
+
+    exp      转到状态 75
+    unaryop  转到状态 76
+    explist  转到状态 77
+
+
+状态 39
+
+   49 uop: ID anylist • SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 78
+
+
+状态 40
+
+   47 uop: U LPAREN • explist RPAREN argument SEMICOLON
+
+    SIN        偏移，并进入状态 62
+    COS        偏移，并进入状态 63
+    TAN        偏移，并进入状态 64
+    EXP        偏移，并进入状态 65
+    LN         偏移，并进入状态 66
+    SQRT       偏移，并进入状态 67
+    PI         偏移，并进入状态 68
+    MINUS      偏移，并进入状态 69
+    LPAREN     偏移，并进入状态 70
+    REAL       偏移，并进入状态 72
+    NNINTEGER  偏移，并进入状态 73
+    ID         偏移，并进入状态 74
+
+    exp      转到状态 75
+    unaryop  转到状态 76
+    explist  转到状态 79
+
+
+状态 41
+
+   48 uop: CX argument • COMMA argument SEMICOLON
+
+    COMMA  偏移，并进入状态 80
+
+
+状态 42
+
+    5 program: program statement •
+
+    $default  使用规则 5 以归约 (program)
+
+
+状态 43
+
+   56 goplist: BARRIER • idlist SEMICOLON
+
+    ID  偏移，并进入状态 54
+
+    idlist  转到状态 81
+
+
+状态 44
+
+    8 statement: gatedecl RCPAREN •
+
+    $default  使用规则 8 以归约 (statement)
+
+
+状态 45
+
+   55 goplist: uop •
+
+    $default  使用规则 55 以归约 (goplist)
+
+
+状态 46
+
+    7 statement: gatedecl goplist • RCPAREN
+   57 goplist: goplist • uop
+   58        | goplist • BARRIER idlist SEMICOLON
+
+    BARRIER  偏移，并进入状态 82
+    RCPAREN  偏移，并进入状态 83
+    ID       偏移，并进入状态 17
+    U        偏移，并进入状态 18
+    CX       偏移，并进入状态 19
+
+    uop  转到状态 84
+
+
+状态 47
+
+   15 decl: QREG ID LSPAREN • NNINTEGER RSPAREN SEMICOLON
+
+    NNINTEGER  偏移，并进入状态 85
+
+
+状态 48
+
+   16 decl: CREG ID LSPAREN • NNINTEGER RSPAREN SEMICOLON
+
+    NNINTEGER  偏移，并进入状态 86
+
+
+状态 49
+
+   41 mixedlist: ID LSPAREN • NNINTEGER RSPAREN
+
+    NNINTEGER  偏移，并进入状态 87
+
+
+状态 50
+
+   40 idlist: idlist COMMA • ID
+   44 mixedlist: idlist COMMA • ID LSPAREN NNINTEGER RSPAREN
+
+    ID  偏移，并进入状态 88
+
+
+状态 51
+
+   42 mixedlist: mixedlist COMMA • ID
+   43          | mixedlist COMMA • ID LSPAREN NNINTEGER RSPAREN
+
+    ID  偏移，并进入状态 89
+
+
+状态 52
+
+   14 statement: BARRIER anylist SEMICOLON •
+
+    $default  使用规则 14 以归约 (statement)
+
+
+状态 53
+
+   60 gatedecl: GATE ID LPAREN • RPAREN idlist LCPAREN
+   61         | GATE ID LPAREN • idlist RPAREN idlist LCPAREN
+
+    RPAREN  偏移，并进入状态 90
+    ID      偏移，并进入状态 54
+
+    idlist  转到状态 91
+
+
+状态 54
+
+   39 idlist: ID •
+
+    $default  使用规则 39 以归约 (idlist)
+
+
+状态 55
+
+   40 idlist: idlist • COMMA ID
+   59 gatedecl: GATE ID idlist • LCPAREN
+
+    COMMA    偏移，并进入状态 92
+    LCPAREN  偏移，并进入状态 93
+
+
+状态 56
+
+   38 argument: ID LSPAREN • NNINTEGER RSPAREN
+
+    NNINTEGER  偏移，并进入状态 94
+
+
+状态 57
+
+   53 qop: MEASURE argument ARROW • argument SEMICOLON
+
+    ID  偏移，并进入状态 33
+
+    argument  转到状态 95
+
+
+状态 58
+
+   54 qop: RESET argument SEMICOLON •
+
+    $default  使用规则 54 以归约 (qop)
+
+
+状态 59
+
+   10 statement: OPAQUE ID LPAREN • RPAREN idlist SEMICOLON
+   11          | OPAQUE ID LPAREN • idlist RPAREN idlist SEMICOLON
+
+    RPAREN  偏移，并进入状态 96
+    ID      偏移，并进入状态 54
+
+    idlist  转到状态 97
+
+
+状态 60
+
+    9 statement: OPAQUE ID idlist • SEMICOLON
+   40 idlist: idlist • COMMA ID
+
+    SEMICOLON  偏移，并进入状态 98
+    COMMA      偏移，并进入状态 92
+
+
+状态 61
+
+   13 statement: IF LPAREN ID • EQUAL NNINTEGER RPAREN qop
+
+    EQUAL  偏移，并进入状态 99
+
+
+状态 62
+
+   29 unaryop: SIN •
+
+    $default  使用规则 29 以归约 (unaryop)
+
+
+状态 63
+
+   30 unaryop: COS •
+
+    $default  使用规则 30 以归约 (unaryop)
+
+
+状态 64
+
+   31 unaryop: TAN •
+
+    $default  使用规则 31 以归约 (unaryop)
+
+
+状态 65
+
+   32 unaryop: EXP •
+
+    $default  使用规则 32 以归约 (unaryop)
+
+
+状态 66
+
+   33 unaryop: LN •
+
+    $default  使用规则 33 以归约 (unaryop)
+
+
+状态 67
+
+   34 unaryop: SQRT •
+
+    $default  使用规则 34 以归约 (unaryop)
+
+
+状态 68
+
+   17 exp: PI •
+
+    $default  使用规则 17 以归约 (exp)
+
+
+状态 69
+
+   26 exp: MINUS • exp
+
+    SIN        偏移，并进入状态 62
+    COS        偏移，并进入状态 63
+    TAN        偏移，并进入状态 64
+    EXP        偏移，并进入状态 65
+    LN         偏移，并进入状态 66
+    SQRT       偏移，并进入状态 67
+    PI         偏移，并进入状态 68
+    MINUS      偏移，并进入状态 69
+    LPAREN     偏移，并进入状态 70
+    REAL       偏移，并进入状态 72
+    NNINTEGER  偏移，并进入状态 73
+    ID         偏移，并进入状态 74
+
+    exp      转到状态 100
+    unaryop  转到状态 76
+
+
+状态 70
+
+   27 exp: LPAREN • exp RPAREN
+
+    SIN        偏移，并进入状态 62
+    COS        偏移，并进入状态 63
+    TAN        偏移，并进入状态 64
+    EXP        偏移，并进入状态 65
+    LN         偏移，并进入状态 66
+    SQRT       偏移，并进入状态 67
+    PI         偏移，并进入状态 68
+    MINUS      偏移，并进入状态 69
+    LPAREN     偏移，并进入状态 70
+    REAL       偏移，并进入状态 72
+    NNINTEGER  偏移，并进入状态 73
+    ID         偏移，并进入状态 74
+
+    exp      转到状态 101
+    unaryop  转到状态 76
+
+
+状态 71
+
+   50 uop: ID LPAREN RPAREN • anylist SEMICOLON
+
+    ID  偏移，并进入状态 28
+
+    idlist     转到状态 29
+    mixedlist  转到状态 30
+    anylist    转到状态 102
+
+
+状态 72
+
+   20 exp: REAL •
+
+    $default  使用规则 20 以归约 (exp)
+
+
+状态 73
+
+   19 exp: NNINTEGER •
+
+    $default  使用规则 19 以归约 (exp)
+
+
+状态 74
+
+   18 exp: ID •
+
+    $default  使用规则 18 以归约 (exp)
+
+
+状态 75
+
+   21 exp: exp • MINUS exp
+   22    | exp • TIMES exp
+   23    | exp • DIVIDE exp
+   24    | exp • PLUS exp
+   25    | exp • POWER exp
+   35 explist: exp •
+
+    PLUS    偏移，并进入状态 103
+    MINUS   偏移，并进入状态 104
+    TIMES   偏移，并进入状态 105
+    DIVIDE  偏移，并进入状态 106
+    POWER   偏移，并进入状态 107
+
+    $default  使用规则 35 以归约 (explist)
+
+
+状态 76
+
+   28 exp: unaryop • LPAREN exp RPAREN
+
+    LPAREN  偏移，并进入状态 108
+
+
+状态 77
+
+   36 explist: explist • COMMA exp
+   51 uop: ID LPAREN explist • RPAREN anylist SEMICOLON
+
+    COMMA   偏移，并进入状态 109
+    RPAREN  偏移，并进入状态 110
+
+
+状态 78
+
+   49 uop: ID anylist SEMICOLON •
+
+    $default  使用规则 49 以归约 (uop)
+
+
+状态 79
+
+   36 explist: explist • COMMA exp
+   47 uop: U LPAREN explist • RPAREN argument SEMICOLON
+
+    COMMA   偏移，并进入状态 109
+    RPAREN  偏移，并进入状态 111
+
+
+状态 80
+
+   48 uop: CX argument COMMA • argument SEMICOLON
+
+    ID  偏移，并进入状态 33
+
+    argument  转到状态 112
+
+
+状态 81
+
+   40 idlist: idlist • COMMA ID
+   56 goplist: BARRIER idlist • SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 113
+    COMMA      偏移，并进入状态 92
+
+
+状态 82
+
+   58 goplist: goplist BARRIER • idlist SEMICOLON
+
+    ID  偏移，并进入状态 54
+
+    idlist  转到状态 114
+
+
+状态 83
+
+    7 statement: gatedecl goplist RCPAREN •
+
+    $default  使用规则 7 以归约 (statement)
+
+
+状态 84
+
+   57 goplist: goplist uop •
+
+    $default  使用规则 57 以归约 (goplist)
+
+
+状态 85
+
+   15 decl: QREG ID LSPAREN NNINTEGER • RSPAREN SEMICOLON
+
+    RSPAREN  偏移，并进入状态 115
+
+
+状态 86
+
+   16 decl: CREG ID LSPAREN NNINTEGER • RSPAREN SEMICOLON
+
+    RSPAREN  偏移，并进入状态 116
+
+
+状态 87
+
+   41 mixedlist: ID LSPAREN NNINTEGER • RSPAREN
+
+    RSPAREN  偏移，并进入状态 117
+
+
+状态 88
+
+   40 idlist: idlist COMMA ID •
+   44 mixedlist: idlist COMMA ID • LSPAREN NNINTEGER RSPAREN
+
+    LSPAREN  偏移，并进入状态 118
+
+    $default  使用规则 40 以归约 (idlist)
+
+
+状态 89
+
+   42 mixedlist: mixedlist COMMA ID •
+   43          | mixedlist COMMA ID • LSPAREN NNINTEGER RSPAREN
+
+    LSPAREN  偏移，并进入状态 119
+
+    $default  使用规则 42 以归约 (mixedlist)
+
+
+状态 90
+
+   60 gatedecl: GATE ID LPAREN RPAREN • idlist LCPAREN
+
+    ID  偏移，并进入状态 54
+
+    idlist  转到状态 120
+
+
+状态 91
+
+   40 idlist: idlist • COMMA ID
+   61 gatedecl: GATE ID LPAREN idlist • RPAREN idlist LCPAREN
+
+    COMMA   偏移，并进入状态 92
+    RPAREN  偏移，并进入状态 121
+
+
+状态 92
+
+   40 idlist: idlist COMMA • ID
+
+    ID  偏移，并进入状态 122
+
+
+状态 93
+
+   59 gatedecl: GATE ID idlist LCPAREN •
+
+    $default  使用规则 59 以归约 (gatedecl)
+
+
+状态 94
+
+   38 argument: ID LSPAREN NNINTEGER • RSPAREN
+
+    RSPAREN  偏移，并进入状态 123
+
+
+状态 95
+
+   53 qop: MEASURE argument ARROW argument • SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 124
+
+
+状态 96
+
+   10 statement: OPAQUE ID LPAREN RPAREN • idlist SEMICOLON
+
+    ID  偏移，并进入状态 54
+
+    idlist  转到状态 125
+
+
+状态 97
+
+   11 statement: OPAQUE ID LPAREN idlist • RPAREN idlist SEMICOLON
+   40 idlist: idlist • COMMA ID
+
+    COMMA   偏移，并进入状态 92
+    RPAREN  偏移，并进入状态 126
+
+
+状态 98
+
+    9 statement: OPAQUE ID idlist SEMICOLON •
+
+    $default  使用规则 9 以归约 (statement)
+
+
+状态 99
+
+   13 statement: IF LPAREN ID EQUAL • NNINTEGER RPAREN qop
+
+    NNINTEGER  偏移，并进入状态 127
+
+
+状态 100
+
+   21 exp: exp • MINUS exp
+   22    | exp • TIMES exp
+   23    | exp • DIVIDE exp
+   24    | exp • PLUS exp
+   25    | exp • POWER exp
+   26    | MINUS exp •
+
+    $default  使用规则 26 以归约 (exp)
+
+
+状态 101
+
+   21 exp: exp • MINUS exp
+   22    | exp • TIMES exp
+   23    | exp • DIVIDE exp
+   24    | exp • PLUS exp
+   25    | exp • POWER exp
+   27    | LPAREN exp • RPAREN
+
+    PLUS    偏移，并进入状态 103
+    MINUS   偏移，并进入状态 104
+    TIMES   偏移，并进入状态 105
+    DIVIDE  偏移，并进入状态 106
+    POWER   偏移，并进入状态 107
+    RPAREN  偏移，并进入状态 128
+
+
+状态 102
+
+   50 uop: ID LPAREN RPAREN anylist • SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 129
+
+
+状态 103
+
+   24 exp: exp PLUS • exp
+
+    SIN        偏移，并进入状态 62
+    COS        偏移，并进入状态 63
+    TAN        偏移，并进入状态 64
+    EXP        偏移，并进入状态 65
+    LN         偏移，并进入状态 66
+    SQRT       偏移，并进入状态 67
+    PI         偏移，并进入状态 68
+    MINUS      偏移，并进入状态 69
+    LPAREN     偏移，并进入状态 70
+    REAL       偏移，并进入状态 72
+    NNINTEGER  偏移，并进入状态 73
+    ID         偏移，并进入状态 74
+
+    exp      转到状态 130
+    unaryop  转到状态 76
+
+
+状态 104
+
+   21 exp: exp MINUS • exp
+
+    SIN        偏移，并进入状态 62
+    COS        偏移，并进入状态 63
+    TAN        偏移，并进入状态 64
+    EXP        偏移，并进入状态 65
+    LN         偏移，并进入状态 66
+    SQRT       偏移，并进入状态 67
+    PI         偏移，并进入状态 68
+    MINUS      偏移，并进入状态 69
+    LPAREN     偏移，并进入状态 70
+    REAL       偏移，并进入状态 72
+    NNINTEGER  偏移，并进入状态 73
+    ID         偏移，并进入状态 74
+
+    exp      转到状态 131
+    unaryop  转到状态 76
+
+
+状态 105
+
+   22 exp: exp TIMES • exp
+
+    SIN        偏移，并进入状态 62
+    COS        偏移，并进入状态 63
+    TAN        偏移，并进入状态 64
+    EXP        偏移，并进入状态 65
+    LN         偏移，并进入状态 66
+    SQRT       偏移，并进入状态 67
+    PI         偏移，并进入状态 68
+    MINUS      偏移，并进入状态 69
+    LPAREN     偏移，并进入状态 70
+    REAL       偏移，并进入状态 72
+    NNINTEGER  偏移，并进入状态 73
+    ID         偏移，并进入状态 74
+
+    exp      转到状态 132
+    unaryop  转到状态 76
+
+
+状态 106
+
+   23 exp: exp DIVIDE • exp
+
+    SIN        偏移，并进入状态 62
+    COS        偏移，并进入状态 63
+    TAN        偏移，并进入状态 64
+    EXP        偏移，并进入状态 65
+    LN         偏移，并进入状态 66
+    SQRT       偏移，并进入状态 67
+    PI         偏移，并进入状态 68
+    MINUS      偏移，并进入状态 69
+    LPAREN     偏移，并进入状态 70
+    REAL       偏移，并进入状态 72
+    NNINTEGER  偏移，并进入状态 73
+    ID         偏移，并进入状态 74
+
+    exp      转到状态 133
+    unaryop  转到状态 76
+
+
+状态 107
+
+   25 exp: exp POWER • exp
+
+    SIN        偏移，并进入状态 62
+    COS        偏移，并进入状态 63
+    TAN        偏移，并进入状态 64
+    EXP        偏移，并进入状态 65
+    LN         偏移，并进入状态 66
+    SQRT       偏移，并进入状态 67
+    PI         偏移，并进入状态 68
+    MINUS      偏移，并进入状态 69
+    LPAREN     偏移，并进入状态 70
+    REAL       偏移，并进入状态 72
+    NNINTEGER  偏移，并进入状态 73
+    ID         偏移，并进入状态 74
+
+    exp      转到状态 134
+    unaryop  转到状态 76
+
+
+状态 108
+
+   28 exp: unaryop LPAREN • exp RPAREN
+
+    SIN        偏移，并进入状态 62
+    COS        偏移，并进入状态 63
+    TAN        偏移，并进入状态 64
+    EXP        偏移，并进入状态 65
+    LN         偏移，并进入状态 66
+    SQRT       偏移，并进入状态 67
+    PI         偏移，并进入状态 68
+    MINUS      偏移，并进入状态 69
+    LPAREN     偏移，并进入状态 70
+    REAL       偏移，并进入状态 72
+    NNINTEGER  偏移，并进入状态 73
+    ID         偏移，并进入状态 74
+
+    exp      转到状态 135
+    unaryop  转到状态 76
+
+
+状态 109
+
+   36 explist: explist COMMA • exp
+
+    SIN        偏移，并进入状态 62
+    COS        偏移，并进入状态 63
+    TAN        偏移，并进入状态 64
+    EXP        偏移，并进入状态 65
+    LN         偏移，并进入状态 66
+    SQRT       偏移，并进入状态 67
+    PI         偏移，并进入状态 68
+    MINUS      偏移，并进入状态 69
+    LPAREN     偏移，并进入状态 70
+    REAL       偏移，并进入状态 72
+    NNINTEGER  偏移，并进入状态 73
+    ID         偏移，并进入状态 74
+
+    exp      转到状态 136
+    unaryop  转到状态 76
+
+
+状态 110
+
+   51 uop: ID LPAREN explist RPAREN • anylist SEMICOLON
+
+    ID  偏移，并进入状态 28
+
+    idlist     转到状态 29
+    mixedlist  转到状态 30
+    anylist    转到状态 137
+
+
+状态 111
+
+   47 uop: U LPAREN explist RPAREN • argument SEMICOLON
+
+    ID  偏移，并进入状态 33
+
+    argument  转到状态 138
+
+
+状态 112
+
+   48 uop: CX argument COMMA argument • SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 139
+
+
+状态 113
+
+   56 goplist: BARRIER idlist SEMICOLON •
+
+    $default  使用规则 56 以归约 (goplist)
+
+
+状态 114
+
+   40 idlist: idlist • COMMA ID
+   58 goplist: goplist BARRIER idlist • SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 140
+    COMMA      偏移，并进入状态 92
+
+
+状态 115
+
+   15 decl: QREG ID LSPAREN NNINTEGER RSPAREN • SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 141
+
+
+状态 116
+
+   16 decl: CREG ID LSPAREN NNINTEGER RSPAREN • SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 142
+
+
+状态 117
+
+   41 mixedlist: ID LSPAREN NNINTEGER RSPAREN •
+
+    $default  使用规则 41 以归约 (mixedlist)
+
+
+状态 118
+
+   44 mixedlist: idlist COMMA ID LSPAREN • NNINTEGER RSPAREN
+
+    NNINTEGER  偏移，并进入状态 143
+
+
+状态 119
+
+   43 mixedlist: mixedlist COMMA ID LSPAREN • NNINTEGER RSPAREN
+
+    NNINTEGER  偏移，并进入状态 144
+
+
+状态 120
+
+   40 idlist: idlist • COMMA ID
+   60 gatedecl: GATE ID LPAREN RPAREN idlist • LCPAREN
+
+    COMMA    偏移，并进入状态 92
+    LCPAREN  偏移，并进入状态 145
+
+
+状态 121
+
+   61 gatedecl: GATE ID LPAREN idlist RPAREN • idlist LCPAREN
+
+    ID  偏移，并进入状态 54
+
+    idlist  转到状态 146
+
+
+状态 122
+
+   40 idlist: idlist COMMA ID •
+
+    $default  使用规则 40 以归约 (idlist)
+
+
+状态 123
+
+   38 argument: ID LSPAREN NNINTEGER RSPAREN •
+
+    $default  使用规则 38 以归约 (argument)
+
+
+状态 124
+
+   53 qop: MEASURE argument ARROW argument SEMICOLON •
+
+    $default  使用规则 53 以归约 (qop)
+
+
+状态 125
+
+   10 statement: OPAQUE ID LPAREN RPAREN idlist • SEMICOLON
+   40 idlist: idlist • COMMA ID
+
+    SEMICOLON  偏移，并进入状态 147
+    COMMA      偏移，并进入状态 92
+
+
+状态 126
+
+   11 statement: OPAQUE ID LPAREN idlist RPAREN • idlist SEMICOLON
+
+    ID  偏移，并进入状态 54
+
+    idlist  转到状态 148
+
+
+状态 127
+
+   13 statement: IF LPAREN ID EQUAL NNINTEGER • RPAREN qop
+
+    RPAREN  偏移，并进入状态 149
+
+
+状态 128
+
+   27 exp: LPAREN exp RPAREN •
+
+    $default  使用规则 27 以归约 (exp)
+
+
+状态 129
+
+   50 uop: ID LPAREN RPAREN anylist SEMICOLON •
+
+    $default  使用规则 50 以归约 (uop)
+
+
+状态 130
+
+   21 exp: exp • MINUS exp
+   22    | exp • TIMES exp
+   23    | exp • DIVIDE exp
+   24    | exp • PLUS exp
+   24    | exp PLUS exp •
+   25    | exp • POWER exp
+
+    TIMES   偏移，并进入状态 105
+    DIVIDE  偏移，并进入状态 106
+    POWER   偏移，并进入状态 107
+
+    $default  使用规则 24 以归约 (exp)
+
+
+状态 131
+
+   21 exp: exp • MINUS exp
+   21    | exp MINUS exp •
+   22    | exp • TIMES exp
+   23    | exp • DIVIDE exp
+   24    | exp • PLUS exp
+   25    | exp • POWER exp
+
+    TIMES   偏移，并进入状态 105
+    DIVIDE  偏移，并进入状态 106
+    POWER   偏移，并进入状态 107
+
+    $default  使用规则 21 以归约 (exp)
+
+
+状态 132
+
+   21 exp: exp • MINUS exp
+   22    | exp • TIMES exp
+   22    | exp TIMES exp •
+   23    | exp • DIVIDE exp
+   24    | exp • PLUS exp
+   25    | exp • POWER exp
+
+    POWER  偏移，并进入状态 107
+
+    $default  使用规则 22 以归约 (exp)
+
+
+状态 133
+
+   21 exp: exp • MINUS exp
+   22    | exp • TIMES exp
+   23    | exp • DIVIDE exp
+   23    | exp DIVIDE exp •
+   24    | exp • PLUS exp
+   25    | exp • POWER exp
+
+    POWER  偏移，并进入状态 107
+
+    $default  使用规则 23 以归约 (exp)
+
+
+状态 134
+
+   21 exp: exp • MINUS exp
+   22    | exp • TIMES exp
+   23    | exp • DIVIDE exp
+   24    | exp • PLUS exp
+   25    | exp • POWER exp
+   25    | exp POWER exp •
+
+    POWER  偏移，并进入状态 107
+
+    $default  使用规则 25 以归约 (exp)
+
+
+状态 135
+
+   21 exp: exp • MINUS exp
+   22    | exp • TIMES exp
+   23    | exp • DIVIDE exp
+   24    | exp • PLUS exp
+   25    | exp • POWER exp
+   28    | unaryop LPAREN exp • RPAREN
+
+    PLUS    偏移，并进入状态 103
+    MINUS   偏移，并进入状态 104
+    TIMES   偏移，并进入状态 105
+    DIVIDE  偏移，并进入状态 106
+    POWER   偏移，并进入状态 107
+    RPAREN  偏移，并进入状态 150
+
+
+状态 136
+
+   21 exp: exp • MINUS exp
+   22    | exp • TIMES exp
+   23    | exp • DIVIDE exp
+   24    | exp • PLUS exp
+   25    | exp • POWER exp
+   36 explist: explist COMMA exp •
+
+    PLUS    偏移，并进入状态 103
+    MINUS   偏移，并进入状态 104
+    TIMES   偏移，并进入状态 105
+    DIVIDE  偏移，并进入状态 106
+    POWER   偏移，并进入状态 107
+
+    $default  使用规则 36 以归约 (explist)
+
+
+状态 137
+
+   51 uop: ID LPAREN explist RPAREN anylist • SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 151
+
+
+状态 138
+
+   47 uop: U LPAREN explist RPAREN argument • SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 152
+
+
+状态 139
+
+   48 uop: CX argument COMMA argument SEMICOLON •
+
+    $default  使用规则 48 以归约 (uop)
+
+
+状态 140
+
+   58 goplist: goplist BARRIER idlist SEMICOLON •
+
+    $default  使用规则 58 以归约 (goplist)
+
+
+状态 141
+
+   15 decl: QREG ID LSPAREN NNINTEGER RSPAREN SEMICOLON •
+
+    $default  使用规则 15 以归约 (decl)
+
+
+状态 142
+
+   16 decl: CREG ID LSPAREN NNINTEGER RSPAREN SEMICOLON •
+
+    $default  使用规则 16 以归约 (decl)
+
+
+状态 143
+
+   44 mixedlist: idlist COMMA ID LSPAREN NNINTEGER • RSPAREN
+
+    RSPAREN  偏移，并进入状态 153
+
+
+状态 144
+
+   43 mixedlist: mixedlist COMMA ID LSPAREN NNINTEGER • RSPAREN
+
+    RSPAREN  偏移，并进入状态 154
+
+
+状态 145
+
+   60 gatedecl: GATE ID LPAREN RPAREN idlist LCPAREN •
+
+    $default  使用规则 60 以归约 (gatedecl)
+
+
+状态 146
+
+   40 idlist: idlist • COMMA ID
+   61 gatedecl: GATE ID LPAREN idlist RPAREN idlist • LCPAREN
+
+    COMMA    偏移，并进入状态 92
+    LCPAREN  偏移，并进入状态 155
+
+
+状态 147
+
+   10 statement: OPAQUE ID LPAREN RPAREN idlist SEMICOLON •
+
+    $default  使用规则 10 以归约 (statement)
+
+
+状态 148
+
+   11 statement: OPAQUE ID LPAREN idlist RPAREN idlist • SEMICOLON
+   40 idlist: idlist • COMMA ID
+
+    SEMICOLON  偏移，并进入状态 156
+    COMMA      偏移，并进入状态 92
+
+
+状态 149
+
+   13 statement: IF LPAREN ID EQUAL NNINTEGER RPAREN • qop
+
+    MEASURE  偏移，并进入状态 13
+    RESET    偏移，并进入状态 14
+    ID       偏移，并进入状态 17
+    U        偏移，并进入状态 18
+    CX       偏移，并进入状态 19
+
+    uop  转到状态 23
+    qop  转到状态 157
+
+
+状态 150
+
+   28 exp: unaryop LPAREN exp RPAREN •
+
+    $default  使用规则 28 以归约 (exp)
+
+
+状态 151
+
+   51 uop: ID LPAREN explist RPAREN anylist SEMICOLON •
+
+    $default  使用规则 51 以归约 (uop)
+
+
+状态 152
+
+   47 uop: U LPAREN explist RPAREN argument SEMICOLON •
+
+    $default  使用规则 47 以归约 (uop)
+
+
+状态 153
+
+   44 mixedlist: idlist COMMA ID LSPAREN NNINTEGER RSPAREN •
+
+    $default  使用规则 44 以归约 (mixedlist)
+
+
+状态 154
+
+   43 mixedlist: mixedlist COMMA ID LSPAREN NNINTEGER RSPAREN •
+
+    $default  使用规则 43 以归约 (mixedlist)
+
+
+状态 155
+
+   61 gatedecl: GATE ID LPAREN idlist RPAREN idlist LCPAREN •
+
+    $default  使用规则 61 以归约 (gatedecl)
+
+
+状态 156
+
+   11 statement: OPAQUE ID LPAREN idlist RPAREN idlist SEMICOLON •
+
+    $default  使用规则 11 以归约 (statement)
+
+
+状态 157
+
+   13 statement: IF LPAREN ID EQUAL NNINTEGER RPAREN qop •
+
+    $default  使用规则 13 以归约 (statement)
