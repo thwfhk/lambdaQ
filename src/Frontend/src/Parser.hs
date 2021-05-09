@@ -66,7 +66,7 @@ parseVar :: Parser Term
 parseVar = do
   var <- identifier
   ctx <- getState
-  idx <- name2index ctx var
+  let idx = name2index ctx var
   return $ TmVar idx (length ctx)
 
 parseAbs :: Parser Term
@@ -77,7 +77,7 @@ parseAbs = do
   ty <- parseType
   dot
   ctx <- getState
-  setState $ addBinding ctx var (VarBind ty)
+  setState $ addBinding ctx (var, VarBind ty)
   term <- parseTerm
   setState ctx
   return $ TmAbs var ty term
@@ -97,7 +97,7 @@ parseCAbs = do
   traceM $ "#####[WTYPE]: " ++ show wtype ++ " [END]#####"
   dot
   ctx <- getState
-  addPatWtypeBinding patvar wtype
+  addPatWtypeBindingP (patvar, wtype)
   circ <- parseCirc
   setState ctx
   return $ TmCir patvar wtype circ
@@ -179,7 +179,7 @@ parseGateApp = do
   pat1 <- parsePattern False
   semi
   ctx <- getState
-  addPatNameBinding pat2
+  addPatNameBindingP pat2
   circ <- parseCirc
   setState ctx
   return $ CcGate pat2 gate pat1 circ
@@ -191,7 +191,7 @@ parseComp = do
   circ1 <- parseCirc
   semi
   ctx <- getState
-  addPatNameBinding pat
+  addPatNameBindingP pat
   circ2 <- parseCirc
   return $ CcComp pat circ1 circ2
 
@@ -200,7 +200,7 @@ parseCapp :: Parser Circ
 parseCapp = do
   reserved "capp"
   t <- parseTerm
-  traceM $ "Hi " ++ show t
+  reserved "to"
   p <- parsePattern False
   return $ CcApp t p
 
@@ -249,7 +249,7 @@ parseWVar b = do
     return $ PtName var
   else do
     ctx <- getState
-    idx <- name2index ctx var
+    let idx = name2index ctx var
     return $ PtVar idx (length ctx)
 
 parseEmpty :: Bool -> Parser Pattern

@@ -41,7 +41,7 @@ langDef = emptyDef
             , "output"
             , "gate"
             , "lift"
-            , "capp"
+            , "capp", "to"
             ] ++ gateNames
 
 lexer :: Tok.GenTokenParser String u Identity

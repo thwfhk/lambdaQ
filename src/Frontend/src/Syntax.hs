@@ -1,17 +1,15 @@
 module Syntax where
 
-import Data.List
-
 data Type
   = TyUnit
   | TyBool
   | TyProd Type Type
   | TyArr Type Type
   | TyCir Wtype Wtype
-  deriving Show
+  deriving (Show, Eq)
 
 data Term
-  = TmVar Int Int 
+  = TmVar Int Int
   | TmUnit
   | TmTrue
   | TmFalse
@@ -23,7 +21,7 @@ data Term
   | TmIf Term Term Term
   | TmRun Circ
   | TmCir Pattern Wtype Circ
-  deriving Show
+  deriving (Show, Eq)
 
 data Circ
   = CcOutput Pattern
@@ -31,14 +29,14 @@ data Circ
   | CcComp Pattern Circ Circ
   | CcLift Term Pattern Circ
   | CcApp Term Pattern
-  deriving Show
+  deriving (Show, Eq)
 
 data Wtype
   = WtUnit
   | WtBit
   | WtQubit
   | WtProd Wtype Wtype
-  deriving Show
+  deriving (Show, Eq)
 
 data Pattern
   = PtVar Int Int -- De Bruijn Index
@@ -49,7 +47,7 @@ data Pattern
 
 data Gate = Gt String
   -- = GtNew0 | GtNew1 | GtInit0 | GtInit1 | GtMeas | GtDiscard
-  deriving Show
+  deriving (Show, Eq)
 
 gateInfos :: [(String, Wtype, Wtype)]
 gateInfos =
@@ -64,8 +62,3 @@ gateInfos =
 
 gateNames :: [String]
 gateNames = map (\(a, _, _) -> a) gateInfos
-
-getGateWtype :: Gate-> Wtype
-getGateWtype (Gt s) = case (find (\(a, _, _) -> a == s) gateInfos) of
-  Nothing -> error $ "getGateWtype: gate " ++ s ++ " not defined" 
-  Just (_, _, c) -> c
