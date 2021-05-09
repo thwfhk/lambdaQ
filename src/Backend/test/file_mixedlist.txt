@@ -1,0 +1,5 @@
+openqasm 1.3;
+intersting[0], a, b, c, abc
+intersting, a, b, c, abc
+intersting[0], a, b, c, abc[1]
+intersting, a, b[2], c, abc

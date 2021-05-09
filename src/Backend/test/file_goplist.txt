@@ -1,0 +1,8 @@
+openqasm 1.3;
+barrier dsf;
+mygate(1, pi*3/3+(a-b), 2) x[1], a;
+mygate anv[2], abc;
+barrier a,c;
+mygate a,b,c;
+barrier a,b,c;
+barrier  fd;
