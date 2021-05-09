@@ -105,7 +105,7 @@ parseCAbs = do
   patvar <- parsePattern
   colon
   wtype <- parseWtype
-  traceM $ "#####[WTYPE]: " ++ show wtype ++ " [END]#####"
+  -- traceM $ "#####[WTYPE]: " ++ show wtype ++ " [END]#####"
   dot
   ctx <- getSnd
   case addPatNameBinding ctx patvar of

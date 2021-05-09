@@ -98,6 +98,17 @@ constructOmega li omega = mapM f li
       Just t -> return t
       Nothing -> throwError $ "name " ++ show x ++ " not in omega"
 
+constructOmega' :: MonadError Err m => Pattern -> Wtype -> Context -> m Context
+constructOmega' pat wt ctx = case pat of
+  PtVar _ _ -> throwError $ "constructOmega': Invalid PtVar in Pattern"
+  PtEmp -> return ctx
+  PtName name -> return $ addBinding ctx (name, WireBind wt)
+  PtProd p1 p2 -> case wt of
+    WtProd w1 w2 -> do
+      ctx' <- constructOmega' p1 w1 ctx
+      constructOmega' p2 w2 ctx'
+    _ -> throwError $ "constructOmega': Pattern and Wtype mismatch"
+
 -- | get the names used in a circuit
 getOmegaNames :: Circ -> [Name]
 getOmegaNames (CcOutput p) = namesInPattern p
@@ -140,35 +151,28 @@ wtypeOf :: Circ -> ExceptT String (State Contexts) Wtype
 -- wtypeOf = undefined
 wtypeOf (CcOutput p) = do
   omega <- getsnd
-  traceM $ "omega: " ++ show (map fst omega) -- NOTE: debug here
-  traceM $ "li:    " ++ show (namesInPattern p)
+  -- traceM $ "omega: " ++ show (map fst omega) -- NOTE: debug here
+  -- traceM $ "li:    " ++ show (namesInPattern p)
   if map fst omega `equal` namesInPattern p
     then omegaPatWtype p
     else throwError $ "wtypeOf CcOutput: Omega mismatch"
-wtypeOf (CcGate p1 g p2 c) = do
+wtypeOf (CcGate p2 g p1 c) = do
   omega <- getsnd
   (w1, w2) <- getGateType g
-  let li1 = namesInPattern p1
-  omega1 <- constructOmega li1 omega
-  opwCheck omega1 p1 w1
-  let li2 = namesInPattern p2
-  omega2 <- constructOmega li2 omega
-  opwCheck omega2 p2 w2
-  let omega' = omega `remove` omega2
+  omega1 <- constructOmega' p1 w1 emptyctx
+  let omega' = omega `remove` omega1 -- already check omega == omega' + omega1
+  omega2 <- constructOmega' p2 w2 emptyctx
   setsnd $ omega2 ++ omega'
   w <- wtypeOf c
   setsnd $ omega
   return w
 wtypeOf (CcComp p c c') = do
   omega <- getsnd
-  let li1 = getOmegaNames c
-  omega1 <- constructOmega li1 omega
+  omega1 <- constructOmega (getOmegaNames c) omega
+  let omega2 = omega `remove` omega1
   setsnd omega1
   w <- wtypeOf c
-  let omega2 = omega `remove` omega1
-  let li = namesInPattern p
-  omega' <- constructOmega li omega
-  opwCheck omega' p w
+  omega' <- constructOmega' p w emptyctx
   setsnd $ omega2 ++ omega'
   w' <- wtypeOf c'
   setsnd $ omega
