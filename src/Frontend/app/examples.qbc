@@ -1,0 +1,29 @@
+-- basic examples
+(\ x : Bool * Bool . if x.1 then x.2 else false) (true, false)
+(\ x : Unit . \ y : Unit . x) unit unit
+\ x : Bool * Bool -> Bool . x (true, true)
+\ x : Bool * (Bool -> Bool) . x.2 x.1
+/ x : Bit . output x
+/ (x, y) : Bit # Bit . output (y, x)
+
+\ c : Qubit ~> Qubit . / w : Qubit . capp c to w
+/ w : Bit . capp (/ a : Bit . output a)
+/ () : One . (w <- gate init1 () ; capp (/ a : Qubit . output a) to w)
+\ x : Bool . if x then run (w <- gate init1 () ; capp (/ a : Qubit . output a) to w) else false
+
+/ (a, b) : Qubit # Qubit . (x, y) <- gate CNOT (a, b); output (x, y)
+
+-- hadamard-measure : Circ(qubit,bit)
+/ w : Qubit . w' <- gate H w; b <- gate meas w'; output b
+
+-- It needs parametric polymorphism, so we don't support it currently :(
+-- inSeq (c1 : Circ(W1,W2)) (c2 : Circ(W2,W3)) : Circ(W1,W3)
+\ c1 : W1 ~> W2 . \ c2 : W2 ~> W3 . / w1 : W1 . w2 <- unbox c1 w1; capp c2 w2
+
+
+----------------------------------------------------------------
+-- bell00 : Circ(1, qubit ⊗ qubit)
+/ () : One . a <- gate init0 (); b <- gate init0 (); a <- gate H a; (a, b) <- gate CNOT (a, b); output (a, b)
+
+-- alice : Circ(qubit ⊗ qubit, bit ⊗ bit)
+/ (q, a) : Qubit # Qubit . (q, a) <- gate CNOT (q, a); q <- gate H q; x <- gate meas q; y <- gate meas a; output (x,y)

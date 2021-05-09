@@ -70,7 +70,7 @@ parseProj = do
   return $ \t -> case num of
     "1" -> TmFst t
     "2" -> TmSnd t
-    _ -> error "Product Index Error"
+    _ -> error "parseProj: Product Index Error" -- any better way?
 
 parseVar :: Parser Term
 parseVar = do
@@ -285,24 +285,6 @@ parsePattern = (whiteSpace >>) $
 
 ----------------------------------------------------------------
 -- Parse Gate
-
--- parseNew0 :: Parser Gate
--- parseNew0 = reserved "new0" >> return GtNew0
-
--- parseNew1 :: Parser Gate
--- parseNew1 = reserved "new1" >> return GtNew1
-
--- parseInit0 :: Parser Gate
--- parseInit0 = reserved "init0" >> return GtInit0
-
--- parseInit1 :: Parser Gate
--- parseInit1 = reserved "init1" >> return GtInit1
-
--- parseMeas :: Parser Gate
--- parseMeas = reserved "meas" >> return GtMeas
-
--- parseDiscard :: Parser Gate
--- parseDiscard = reserved "discard" >> return GtDiscard
 
 parseGate :: Parser Gate
 parseGate = foldl (\p s -> p <|> (reserved s >> return (Gt s))) empty gateNames

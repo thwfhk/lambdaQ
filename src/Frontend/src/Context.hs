@@ -53,55 +53,29 @@ addBinding ctx (x, bind) = (x, bind) : ctx
 -- | Add all wire variables in the Pattern to the Context
 -- The types of all variables are given in the corresponding position of Wtype
 
-addPatWtypeBinding :: MonadError Err m => Context -> (Pattern, Wtype) -> m Context
-addPatWtypeBinding ctx (patvar, wtype) = case patvar of
-  PtVar _ _    -> throwError "Invalid PtVar in Pattern"
-  PtName name  -> return $ addBinding ctx (name, WireBind wtype)
-  PtEmp        -> return emptyctx
-  PtProd p1 p2 -> case wtype of
+-- | construct a omega from a pattern and its wire-type
+constructOmega :: MonadError Err m => Pattern -> Wtype -> Context -> m Context
+constructOmega pat wt ctx = case pat of
+  PtVar _ _ -> throwError $ "constructOmega: invalid PtVar in pattern"
+  PtEmp -> return ctx
+  PtName name -> return $ addBinding ctx (name, WireBind wt)
+  PtProd p1 p2 -> case wt of
     WtProd w1 w2 -> do
-      ctx' <- addPatWtypeBinding ctx (p1, w1)
-      addPatWtypeBinding ctx' (p2, w2)
-    _            -> throwError "Pattern and Wtype mismatch"
+      ctx' <- constructOmega p1 w1 ctx
+      constructOmega p2 w2 ctx'
+    _ -> throwError $ "constructOmega: pattern and wtype mismatch"
+
+addPatWtypeBinding :: MonadError Err m => Context -> (Pattern, Wtype) -> m Context
+addPatWtypeBinding ctx (patvar, wtype) = constructOmega patvar wtype ctx
 
 addPatNameBinding :: MonadError Err m => Context -> Pattern -> m Context
 addPatNameBinding ctx patvar = case patvar of
-  PtVar _ _    -> throwError "Invalid PtVar in Pattern"
+  PtVar _ _    -> throwError "addPatNameBinding: Invalid PtVar in Pattern"
   PtName name  -> return $ addBinding ctx (name, NameBind)
   PtEmp        -> return emptyctx
   PtProd p1 p2 -> do
       ctx' <- addPatNameBinding ctx p1
       addPatNameBinding ctx' p2
-
--- addPatWtypeBindingP :: (Pattern, Wtype) -> Parser ()
--- addPatWtypeBindingP = setQwQParser addPatWtypeBinding
-
--- addPatNameBindingP :: Pattern -> Parser ()
--- addPatNameBindingP = setQwQParser addPatNameBinding
-
--- addPatWtypeBindingM :: MonadState Context m => (Pattern, Wtype) -> m ()
--- addPatWtypeBindingM = setQwQ addPatWtypeBinding
-
--- addPatNameBindingM :: MonadState Context m => Pattern -> m ()
--- addPatNameBindingM = setQwQ addPatNameBinding
-
--- TODO: use MonadError to rewrite these
-
--- addPatWtypeBinding :: Pattern -> Wtype -> Parser ()
--- addPatWtypeBinding patvar wtype = case patvar of
---   PtVar _ _    -> error "Invalid PtVar in addPatBinding2State"
---   PtName name  -> getState >>= \ctx -> setState (addBinding ctx (name, WireBind wtype))
---   PtEmp        -> return ()
---   PtProd p1 p2 -> case wtype of
---     WtProd w1 w2 -> addPatWtypeBinding p1 w1 >> addPatWtypeBinding p2 w2
---     _            -> error "Pattern and Wtype not match in addPatBinding2State"
-
--- addPatNameBinding :: Pattern -> Parser ()
--- addPatNameBinding patvar = case patvar of
---   PtVar _ _    -> error "Invalid PtVar in addPatBinding2State"
---   PtName name  -> getState >>= \ctx -> setState (addBinding ctx (name, NameBind))
---   PtEmp        -> return ()
---   PtProd p1 p2 -> addPatNameBinding p1 >> addPatNameBinding p2
 
 name2index :: Context -> Name -> Either Err Int
 name2index ctx name =
@@ -124,6 +98,7 @@ index2entry ctx x
 index2bind :: Context -> Int -> Either Err Binding
 index2bind ctx x = fmap snd $ index2entry ctx x
 
+-- helper functions for interacting with Contexts State
 getfst :: (MonadState (c1, c2) m, MonadError Err m) => m c1
 getfst = fst <$> get
 getsnd :: (MonadState (c1, c2) m, MonadError Err m) => m c2
@@ -141,14 +116,16 @@ getQwQ g f a = do
     Right b -> return b
     Left e -> throwError e
 
+-- Gamma uses De Bruijn index
 index2Gamma :: (MonadState Contexts m, MonadError Err m)
             => Int -> m (Name, Binding)
 index2Gamma = getQwQ getfst index2entry
 
-index2Omega :: (MonadState Contexts m, MonadError Err m)
-            => Int -> m (Name, Binding)
-index2Omega = getQwQ getsnd index2entry
+-- index2Omega :: (MonadState Contexts m, MonadError Err m)
+--             => Int -> m (Name, Binding)
+-- index2Omega = getQwQ getsnd index2entry
 
+-- Omega uses names
 name2Omega :: (MonadState Contexts m, MonadError Err m)
             => Name -> m (Name, Binding)
 name2Omega = getQwQ getsnd name2entry
