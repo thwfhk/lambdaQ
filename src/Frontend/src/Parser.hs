@@ -259,37 +259,29 @@ parseWtype = whiteSpace >> Ex.buildExpressionParser wtypeOps parsePrimWtype
 ----------------------------------------------------------------
 -- Parse Pattern
 
-parseWVar :: Bool -> Parser Pattern
-parseWVar b = do
+parseWVar :: Parser Pattern
+parseWVar = do
   var <- identifier
-  if b then
-    return $ PtName var
-  else do
-    ctx <- getSnd
-    case name2index ctx var of
-      Right idx -> return $ PtVar idx (length ctx)
-      Left e -> error e
+  return $ PtName var
 
-parseEmpty :: Bool -> Parser Pattern
-parseEmpty b = do
+parseEmpty :: Parser Pattern
+parseEmpty = do
   reservedOp "()"
   return PtEmp
 
-parsePProd :: Bool -> Parser Pattern
-parsePProd b = parens $ do
+parsePProd :: Parser Pattern
+parsePProd = parens $ do
   p1 <- parsePattern
   comma
   p2 <- parsePattern
   return $ PtProd p1 p2
 
 -- | Parse a Pattern
--- True: use string name
--- False: use Debruijn Index
 parsePattern :: Parser Pattern
 parsePattern = (whiteSpace >>) $
-      parseWVar True
-  <|> try (parseEmpty True)
-  <|> try (parsePProd True)
+      try parseWVar
+  <|> try parseEmpty
+  <|> try parsePProd
 
 ----------------------------------------------------------------
 -- Parse Gate

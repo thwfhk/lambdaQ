@@ -179,7 +179,9 @@ wtypeOf (CcComp p c c') = do
   return w'
 wtypeOf (CcApp t p) = do
   omega <- getsnd
+  setsnd emptyctx
   ty <- typeOf t
+  setsnd omega
   case ty of
     TyCir w1 w2 -> do
       let li = namesInPattern p

@@ -46,7 +46,6 @@ data Pattern
   deriving (Show, Eq)
 
 data Gate = Gt String
-  -- = GtNew0 | GtNew1 | GtInit0 | GtInit1 | GtMeas | GtDiscard
   deriving (Show, Eq)
 
 gateInfos :: [(String, Wtype, Wtype)]
@@ -58,6 +57,7 @@ gateInfos =
   , ("meas", WtQubit, WtBit)
   , ("discard", WtBit, WtUnit)
   , ("H", WtQubit, WtQubit)
+  , ("CNOT", WtProd WtQubit WtQubit, WtProd WtQubit WtQubit)
   ]
 
 gateNames :: [String]
