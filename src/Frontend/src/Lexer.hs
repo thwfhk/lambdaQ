@@ -23,7 +23,7 @@ langDef = emptyDef
           , "/"  -- kappa
           , "#"  -- otimes
           , "<-" -- pattern binding
-          , "<~" -- variable binding (lift)
+          , "<-|" -- variable binding (lift)
           , "()"
           ]
     names = [ "unit"

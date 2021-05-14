@@ -227,7 +227,7 @@ parseCapp = do
 -- parseLift :: Parser Circ
 -- parseLift = do
 --   var <- identifier
---   reservedOp "<~"
+--   reservedOp "<-|"
 --   reserved "lift"
 --   p <- parsePattern
 --   semi
