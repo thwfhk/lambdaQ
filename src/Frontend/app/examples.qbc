@@ -27,3 +27,9 @@
 
 -- alice : Circ(qubit ⊗ qubit, bit ⊗ bit)
 / (q, a) : Qubit # Qubit . (q, a) <- gate CNOT (q, a); q <- gate H q; x <- gate meas q; y <- gate meas a; output (x,y)
+
+
+----------------------------------------------------------------
+-- linearity
+/ (a, a) : One # One . output a
+/ (a, a) : One # One . output (a, a) -- Success. Is it a bug?

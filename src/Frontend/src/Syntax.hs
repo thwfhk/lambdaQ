@@ -27,7 +27,7 @@ data Circ
   = CcOutput Pattern
   | CcGate Pattern Gate Pattern Circ
   | CcComp Pattern Circ Circ
-  | CcLift Term Pattern Circ
+  | CcLift String Pattern Circ
   | CcApp Term Pattern
   deriving (Show, Eq)
 
@@ -39,10 +39,10 @@ data Wtype
   deriving (Show, Eq)
 
 data Pattern
-  = PtVar Int Int -- De Bruijn Index
-  | PtName String -- Name
+  = PtName String -- Name
   | PtEmp
   | PtProd Pattern Pattern
+  --  | PtVar Int Int -- De Bruijn Index
   deriving (Show, Eq)
 
 data Gate = Gt String

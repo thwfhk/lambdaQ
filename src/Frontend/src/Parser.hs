@@ -221,7 +221,19 @@ parseCapp = do
   p <- parsePattern
   return $ CcApp t p
 
--- TODO: not finished
+-- NOTE: I think lift is not so important, and a type annotation is needed
+-- in order to avoid using unification.
+-- So I decide to leave it here uncomplete currently.
+-- parseLift :: Parser Circ
+-- parseLift = do
+--   var <- identifier
+--   reservedOp "<~"
+--   reserved "lift"
+--   p <- parsePattern
+--   semi
+--   gamma <- getFst
+--   serFst $ addBinding gamma (var, wtype2type )
+
 
 parseCirc :: Parser Circ
 parseCirc = (whiteSpace >>) $

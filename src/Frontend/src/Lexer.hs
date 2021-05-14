@@ -16,14 +16,14 @@ langDef = emptyDef
     , Tok.reservedNames = names
     }
   where
-    ops = [ "*"
-          , "->"
-          , "~>"
+    ops = [ "*"  -- times
+          , "->" -- function
+          , "~>" -- circuit function
           , "\\" -- lambda
           , "/"  -- kappa
-          , "#" -- times
-          , "<-"
-          , "<="
+          , "#"  -- otimes
+          , "<-" -- pattern binding
+          , "<~" -- variable binding (lift)
           , "()"
           ]
     names = [ "unit"
