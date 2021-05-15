@@ -133,4 +133,48 @@ circ2QASM (CcComp p c1 c2) = do
   addMappings p outpat1
   (prog2, outpat2) <- circ2QASM c2
   return (prog1 ++ prog2, outpat2)
-circ2QASM (CcApp t p) = undefined
+-- circ2QASM (CcApp t p') = case t of
+--   TmCir _ _ _ -> tmCir2QASM t p'
+--   TmIf _ _ _ -> tmIf2QASM t p'
+
+-- tmIf2QASM :: Term -> Pattern -> ExceptT Err (State Registers) (Program, Pattern)
+-- tmIf2QASM t p' = case t of
+--   TmIf t1 t2 t3 -> case t1 of
+--       TmG s -> do
+--         current <- get
+--         (prog2, outpat2) <- tmCir2QASM t2 p'
+--         (prog3, outpat3) <- tmCir2QASM t3 p'
+--         qop2 <- checkIf prog2
+--         qop3 <- checkIf prog3
+--         restore current
+--         if outpat2 /= outpat3 -- outpat2 and outpat3 need to be the same
+--           then throwError $ "tmIf2QASM : different output patterns"
+--           else return ([SmIf s 1 qop2, SmIf s 0 qop3], outpat2)
+--       TmNot (TmG s) -> do
+--         current <- get
+--         (prog2, outpat2) <- tmCir2QASM t2 p'
+--         (prog3, outpat3) <- tmCir2QASM t3 p'
+--         qop2 <- checkIf prog2
+--         qop3 <- checkIf prog3
+--         restore current
+--         if outpat2 /= outpat3 -- outpat2 and outpat3 need to be the same
+--           then throwError $ "tmIf2QASM : different output patterns"
+--           else return ([SmIf s 0 qop2, SmIf s 1 qop3], outpat2)
+--       _ -> throwError $ "tmIf2QASM : condition is too complex"
+--   _ -> throwError $ "tmIf2QASM : not a if"
+--   where
+--     checkIf :: (MonadState Registers m, MonadError Err m) => Program -> m Qop
+--     checkIf prog = case prog of
+--       [SmQop qop] -> return qop
+--       _ -> throwError $ "tmIf2QASM : two many statements in if-branch"
+
+-- tmCir2QASM :: Term -> Pattern -> ExceptT Err (State Registers) (Program, Pattern)
+-- tmCir2QASM t p' = case t of
+--   TmCir p _ c -> do
+--     current@(regs, cnt) <- get
+--     let preg = var2reg regs p'
+--     addMappings p preg
+--     (prog', outpat) <- circ2QASM c
+--     restore current
+--     return (prog', outpat)
+--   _ -> throwError $ "tmCir2QASM : not a circuit abstraction"

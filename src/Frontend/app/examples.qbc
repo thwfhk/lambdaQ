@@ -28,6 +28,13 @@
 -- alice : Circ(qubit ⊗ qubit, bit ⊗ bit)
 / (q, a) : Qubit # Qubit . (q, a) <- gate CNOT (q, a); q <- gate H q; x <- gate meas q; y <- gate meas a; output (x,y)
 
+-- bob : Circ(bit ⊗ bit ⊗ qubit, qubit)
+/ (x, y, b) : Bit # Bit # Qubit .
+    (y,b) <- gate (bit-control X) (y,b);
+    (x,b) <- gate (bit-control Z) (x,b);
+    () <- gate discard y;
+    () <- gate discard x;
+    output b
 
 bell00_string = 
 OPENQASM 2.0;

@@ -58,6 +58,10 @@ typeOf (TmSnd t) = do
   case ty of
     TyProd _ ty2 -> return ty2
     _ -> throwError $ "typeOf TmSnd: not a product"
+typeOf (TmNot t) = do
+  ty <- typeOf t
+  if ty /= TyBool then throwError $ "typeOf TmNot: not a boolean"
+  else return TyBool
 typeOf (TmIf t1 t2 t3) = do
   ty1 <- typeOf t1
   if ty1 /= TyBool then throwError $ "typeOf TmIf: condition is not a boolean"

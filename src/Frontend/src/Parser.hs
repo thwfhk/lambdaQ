@@ -44,6 +44,12 @@ false = do
   reserved "false"
   return TmFalse
 
+parseNot :: Parser Term
+parseNot = do
+  reserved "Not"
+  t <- parseTerm
+  return $ TmNot t
+
 parseIf :: Parser Term
 parseIf = do
   reserved "if"

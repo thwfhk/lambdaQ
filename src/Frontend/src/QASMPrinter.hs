@@ -8,7 +8,7 @@ import Control.Monad.State
 import Control.Monad.Except
 
 printQASM :: Program -> String
-printQASM = foldr (\stmt s -> printStmt stmt ++ "\n" ++ s) "" 
+printQASM = foldr (\stmt s -> printStmt stmt ++ "\n" ++ s) ""
 
 printStmt :: Statement -> String
 printStmt (SmDecl decl) = case decl of

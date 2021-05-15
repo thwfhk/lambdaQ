@@ -29,6 +29,7 @@ langDef = emptyDef
     names = [ "unit"
             , "true"
             , "false"
+            , "not"
             , "if"
             , "then"
             , "else"
@@ -42,6 +43,7 @@ langDef = emptyDef
             , "gate"
             , "lift"
             , "capp", "to"
+            , "G"
             ] ++ gateNames
 
 lexer :: Tok.GenTokenParser String u Identity

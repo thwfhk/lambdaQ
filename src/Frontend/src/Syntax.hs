@@ -13,6 +13,7 @@ data Term
   | TmUnit
   | TmTrue
   | TmFalse
+  | TmNot Term
   | TmAbs String Type Term
   | TmApp Term Term
   | TmProd Term Term
