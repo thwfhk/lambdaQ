@@ -42,7 +42,7 @@ data Pattern
   = PtName String -- Name
   | PtEmp
   | PtProd Pattern Pattern
-  --  | PtVar Int Int -- De Bruijn Index
+  | PtVar Int Int -- De Bruijn Index
   deriving (Show, Eq)
 
 data Gate = Gt String
@@ -57,8 +57,12 @@ gateInfos =
   , ("meas", WtQubit, WtBit)
   , ("discard", WtBit, WtUnit)
   , ("H", WtQubit, WtQubit)
+  , ("X", WtQubit, WtQubit)
   , ("CNOT", WtProd WtQubit WtQubit, WtProd WtQubit WtQubit)
   ]
+
+singleUnitaryGates :: [String]
+singleUnitaryGates = ["H", "X"]
 
 gateNames :: [String]
 gateNames = map (\(a, _, _) -> a) gateInfos

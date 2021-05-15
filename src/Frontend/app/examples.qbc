@@ -29,6 +29,19 @@
 / (q, a) : Qubit # Qubit . (q, a) <- gate CNOT (q, a); q <- gate H q; x <- gate meas q; y <- gate meas a; output (x,y)
 
 
+bell00_string = 
+OPENQASM 2.0;
+include "qelib1.inc";
+qreg q0[1];
+qreg q1[1];
+u3((pi/2),0,pi) q0;
+u3(0,0,((pi-0)/2)) q1;
+cx q0,q1;
+u3(((-(pi))/2),0,((-((0+pi)))/2)) q1;
+cx q0,q1;
+u3((pi/2),0,0) q1;
+
+
 ----------------------------------------------------------------
 -- linearity
 / (a, a) : One # One . output a
