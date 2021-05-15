@@ -7,7 +7,7 @@ type Program = [Statement]
 data Statement
   = SmDecl Decl                 -- <decl>
   | SmQop  Qop                  -- <qop>
-  | SmIf String Int Statement   -- if (<id> == <nninteger>) <qop>
+  | SmIf String Int Qop   -- if (<id> == <nninteger>) <qop>
   deriving Show
 
 data Decl
