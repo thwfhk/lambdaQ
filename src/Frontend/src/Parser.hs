@@ -76,13 +76,13 @@ parseProj = do
   return $ \t -> case num of
     "1" -> TmFst t
     "2" -> TmSnd t
-    _ -> error "parseProj: Product Index Error" -- any better way?
+    _ -> error "parseProj: Product Index Error" -- TODO: any better way?
 
 parseVar :: Parser Term
 parseVar = do
   var <- identifier
   ctx <- getFst
-  case name2index ctx var of
+  case name2index ctx var of -- the only use of context during parsing
     Right idx -> return $ TmVar idx (length ctx)
     Left e -> error e
 
@@ -94,7 +94,8 @@ parseAbs = do
   ty <- parseType
   dot
   ctx <- getFst
-  setFst $ addBinding ctx (var, VarBind ty)
+  -- setFst $ addBinding ctx (var, VarBind ty)
+  setFst $ addBinding ctx (var, NameBind) -- NameBind is enough for parsing
   term <- parseTerm
   setFst ctx
   return $ TmAbs var ty term
@@ -227,9 +228,20 @@ parseCapp = do
   p <- parsePattern
   return $ CcApp t p
 
--- NOTE: I think lift is not so important, and a type annotation is needed
--- in order to avoid using unification.
--- So I decide to leave it here uncomplete currently.
+parseLift :: Parser Circ
+parseLift = do
+  var <- parsePattern
+  reservedOp "<-|"
+  reserved "lift"
+  p <- parsePattern
+  semi
+  gamma <- getFst
+  case addPatNameBinding gamma var of
+    Right gamma' -> setFst gamma'
+    Left e -> error e
+  c <- parseCirc
+  return $ CcLift var p c
+
 -- parseLift :: Parser Circ
 -- parseLift = do
 --   var <- identifier
@@ -238,13 +250,16 @@ parseCapp = do
 --   p <- parsePattern
 --   semi
 --   gamma <- getFst
---   serFst $ addBinding gamma (var, wtype2type )
+--   setFst $ addBinding gamma (var, NameBind)
+--   c <- parseCirc
+--   return $ CcLift var p c
 
 
 parseCirc :: Parser Circ
 parseCirc = (whiteSpace >>) $
       parseOutput
   <|> parseCapp
+  <|> try parseLift
   <|> try parseGateApp
   <|> try parseComp
   <|> parens parseCirc

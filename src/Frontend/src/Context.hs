@@ -28,7 +28,7 @@ emptyctx = []
 emptyctxs :: Contexts
 emptyctxs = ([], [])
 
-addBinding :: Context -> (Name, Binding) -> Context
+addBinding :: [(Name, b)] -> (Name, b) -> [(Name, b)]
 addBinding ctx (x, bind) = (x, bind) : ctx
 
 -- | Add all wire variables in the Pattern to the Context
@@ -46,11 +46,22 @@ constructOmega pat wt ctx = case pat of
       constructOmega p2 w2 ctx'
     _ -> throwError $ "constructOmega: pattern and wtype mismatch"
 
--- | add pattern wtype-bindings
+-- | add pattern wtype bindings
 addPatWtypeBinding :: MonadError Err m => Context -> (Pattern, Wtype) -> m Context
 addPatWtypeBinding ctx (patvar, wtype) = constructOmega patvar wtype ctx
 
--- | add pattern name-bindings
+-- | add pattern type bindings
+addPatTypeBinding :: MonadError Err m => Context -> (Pattern, Type) -> m Context
+addPatTypeBinding ctx (patvar, ty) = case patvar of
+  PtEmp -> return ctx
+  PtName name -> return $ addBinding ctx (name, VarBind ty)
+  PtProd p1 p2 -> case ty of
+    TyProd t1 t2 -> do
+      ctx' <- addPatTypeBinding ctx (p1, t1)
+      addPatTypeBinding ctx' (p2, t2)
+    _ -> throwError $ "addPatTypeBinding: pattern and type mismatch"
+
+-- | add pattern name bindings
 addPatNameBinding :: MonadError Err m => Context -> Pattern -> m Context
 addPatNameBinding ctx patvar = case patvar of
   -- PtVar _ _    -> throwError "addPatNameBinding: Invalid PtVar in Pattern"
@@ -66,26 +77,26 @@ name2index ctx name =
     Just ind -> Right ind
     Nothing -> Left $ "Unbounded variable name \"" ++ name ++ "\""
 
-name2entry :: Context -> Name -> Either Err (Name, Binding)
+name2entry :: [(Name, b)] -> Name -> Either Err (Name, b)
 name2entry ctx name =
   case find ((== name). fst) ctx of
     Just x -> Right x
     Nothing -> Left $ "Unbounded variable name \"" ++ name ++ "\""
 
-index2entry :: Context -> Int -> Either Err (Name, Binding)
+index2entry :: [(Name, b)] -> Int -> Either Err (Name, b)
 index2entry ctx x
   | length ctx > x = Right $ ctx !! x
   | otherwise = Left $ "getIndex: index " ++ show x
               ++ "is overflow, current length: " ++ show (length ctx)
 
 -- helper functions for interacting with Contexts State
-getfst :: (MonadState (c1, c2) m, MonadError Err m) => m c1
+getfst :: MonadState (c1, c2) m => m c1
 getfst = fst <$> get
-getsnd :: (MonadState (c1, c2) m, MonadError Err m) => m c2
+getsnd :: MonadState (c1, c2) m => m c2
 getsnd = snd <$> get
-setfst :: (MonadState (c1, c2) m, MonadError Err m) => c1 -> m ()
+setfst :: MonadState (c1, c2) m => c1 -> m ()
 setfst ctx = get >>= \(_, omega) -> put (ctx, omega)
-setsnd :: (MonadState (c1, c2) m, MonadError Err m) => c2 -> m ()
+setsnd :: MonadState (c1, c2) m => c2 -> m ()
 setsnd ctx = get >>= \(gamma, _) -> put (gamma, ctx)
 
 getQwQ :: (MonadState (c, c) m, MonadError Err m) 

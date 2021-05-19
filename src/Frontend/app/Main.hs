@@ -24,7 +24,7 @@ main = do
       case mty of
         Right ty -> putStrLn $ "[Type SUCCESS 🥳]:\n  " ++ show ty
         Left e -> putStrLn $ "[Type FAIL 😵]: " ++ e
-      let mqasm = runQwQ emptyregs $ term2QASM term
+      let mqasm = runQwQ emptystate $ term2QASM term
       case mqasm of
         Right qasm -> putStrLn $ "[Generation SUCCESS 🥳]:\n  " ++ show qasm ++ "\n" ++ printQASM qasm
         Left e -> putStrLn $ "[Generation FAIL 😵]: " ++ e

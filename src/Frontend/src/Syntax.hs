@@ -28,7 +28,7 @@ data Circ
   = CcOutput Pattern
   | CcGate Pattern Gate Pattern Circ
   | CcComp Pattern Circ Circ
-  | CcLift String Pattern Circ
+  | CcLift Pattern Pattern Circ
   | CcApp Term Pattern
   deriving (Show, Eq)
 

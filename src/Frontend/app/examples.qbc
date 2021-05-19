@@ -20,6 +20,12 @@
 -- inSeq (c1 : Circ(W1,W2)) (c2 : Circ(W2,W3)) : Circ(W1,W3)
 \ c1 : W1 ~> W2 . \ c2 : W2 ~> W3 . / w1 : W1 . w2 <- unbox c1 w1; capp c2 w2
 
+/ () : One . a <- gate init0 (); b <- gate new0 (); x <-| lift b; y <- capp (if x then (/ a : Qubit . a <- gate X a; output a) else (/ a : Qubit . a <- gate X a; output a)) to a; y <- gate H y; output y
+
+if true then (/ a : Qubit . a <- gate X a; output a) else (/ a : Qubit . output a)
+-- TODO: type fail
+
+/ () : One . a <- gate init0 (); b1 <- gate new0 (); b2 <- gate new1 (); (x, y) <-| lift (b1, b2); z <- capp (if y then (/ a : Qubit . a <- gate X a; output a) else (/ a : Qubit . a <- gate X a; output a)) to a; output z
 
 ----------------------------------------------------------------
 -- bell00 : Circ(1, qubit ⊗ qubit)
@@ -29,6 +35,11 @@
 / (q, a) : Qubit # Qubit . (q, a) <- gate CNOT (q, a); q <- gate H q; x <- gate meas q; y <- gate meas a; output (x,y)
 
 -- bob : Circ(bit ⊗ bit ⊗ qubit, qubit)
+/ (w1, w2, q) : Bit # Bit # Qubit .
+    (x1,x2) <-| lift (w1,w2);
+    q <- capp (if x2 then X_gate else id) to q;
+    capp (if x1 then Z_gate else id) to q;
+    output q
 / (x, y, b) : Bit # Bit # Qubit .
     (y,b) <- gate (bit-control X) (y,b);
     (x,b) <- gate (bit-control Z) (x,b);

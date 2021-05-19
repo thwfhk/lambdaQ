@@ -194,7 +194,8 @@ wtypeOf (CcLift x p c) = do
   wtype <- patWtypeOf p
   setsnd $ omega `remove` omegap -- omega == omegap + omegac
   gamma <- getfst
-  setfst $ addBinding gamma (x, VarBind (wtype2type wtype))
+  addPatTypeBinding gamma (x, (wtype2type wtype)) >>= setfst
+  -- setfst $ addBinding gamma (x, VarBind (wtype2type wtype))
   wtype' <- wtypeOf c
   put (gamma, omega)
   return wtype'
