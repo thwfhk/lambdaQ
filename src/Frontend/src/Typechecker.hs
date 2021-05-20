@@ -77,6 +77,7 @@ typeOf (TmCir p wt c) = do
   ctx <- getsnd
   addPatWtypeBinding ctx (p, wt) >>= setsnd
   wtc <- wtypeOf c
+  setsnd ctx
   return $ TyCir wt wtc
 
 -- some utilities functions for operating lists

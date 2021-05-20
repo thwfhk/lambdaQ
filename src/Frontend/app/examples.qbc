@@ -22,9 +22,6 @@
 
 / () : One . a <- gate init0 (); b <- gate new0 (); x <-| lift b; y <- capp (if x then (/ a : Qubit . a <- gate X a; output a) else (/ a : Qubit . a <- gate X a; output a)) to a; y <- gate H y; output y
 
-if true then (/ a : Qubit . a <- gate X a; output a) else (/ a : Qubit . output a)
--- TODO: type fail
-
 / () : One . a <- gate init0 (); b1 <- gate new0 (); b2 <- gate new1 (); (x, y) <-| lift (b1, b2); z <- capp (if y then (/ a : Qubit . a <- gate X a; output a) else (/ a : Qubit . a <- gate X a; output a)) to a; output z
 
 ----------------------------------------------------------------
