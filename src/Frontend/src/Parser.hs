@@ -27,6 +27,38 @@ setSnd :: Context -> Parser ()
 setSnd ctx = getState >>= \(gamma, _) -> setState (gamma, ctx)
 
 ----------------------------------------------------------------
+-- Parse Command
+
+parseDef :: Parser Command
+parseDef = do
+  reserved "fun"
+  x <- identifier
+  reservedOp "="
+  t <- parseTerm
+  ctx <- getFst
+  setFst $ addBinding ctx (x, NameBind)
+  return $ Def x t
+
+-- parseAno :: Parser Command
+-- parseAno = do
+--   reserved ""
+--   t <- parseTerm
+--   return $ Ano t
+
+parseCommand :: Parser Command
+parseCommand = whiteSpace >> parseDef
+
+parseCommands :: Parser [Command]
+parseCommands = (whiteSpace >>) $
+      (do
+        s <- getInput
+        -- traceM ("HI: " ++ show s)
+        cmd <- parseCommand
+        cmds <- parseCommands
+        return $ cmd : cmds)
+  <|> return []
+
+----------------------------------------------------------------
 -- Parse Term
 
 unit :: Parser Term
@@ -112,7 +144,6 @@ parseCAbs = do
   patvar <- parsePattern
   colon
   wtype <- parseWtype
-  -- traceM $ "#####[WTYPE]: " ++ show wtype ++ " [END]#####"
   dot
   ctx <- getSnd
   case addPatNameBinding ctx patvar of
@@ -128,7 +159,7 @@ parsePrimTerm = (whiteSpace >>) $
   <|> true
   <|> false
   <|> parseIf
-  <|> parseVar
+  <|> try parseVar
   <|> parseAbs
   <|> try parseProd
   <|> parseRun
@@ -240,6 +271,7 @@ parseLift = do
     Right gamma' -> setFst gamma'
     Left e -> error e
   c <- parseCirc
+  setFst gamma
   return $ CcLift var p c
 
 -- parseLift :: Parser Circ
@@ -321,13 +353,3 @@ parsePattern = (whiteSpace >>) $
 
 parseGate :: Parser Gate
 parseGate = foldl (\p s -> p <|> (reserved s >> return (Gt s))) empty gateNames
-
-----------------------------------------------------------------
-runMyParser :: String -> Either ParseError Term
-runMyParser = runParser parseTerm emptyctxs "<CandyQwQ>" 
-
--- runMyParser :: String -> Either ParseError Wtype
--- runMyParser = runParser parseWtype emptyctx "<CandyQwQ>" 
-
--- runMyParser :: String -> Either ParseError Type
--- runMyParser = runParser parseType emptyctx "<CandyQwQ>" 

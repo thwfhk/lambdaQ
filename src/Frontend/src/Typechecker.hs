@@ -27,6 +27,7 @@ typeOf TmUnit = return TyUnit
 typeOf TmTrue = return TyBool
 typeOf TmFalse = return TyBool
 typeOf (TmVar x _) = do
+  gamma <- getfst
   bty <- snd <$> index2entryGamma x
   case bty of
     VarBind ty -> return ty

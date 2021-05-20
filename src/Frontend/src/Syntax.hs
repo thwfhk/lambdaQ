@@ -1,5 +1,9 @@
 module Syntax where
 
+data Command
+  = Def String Term
+  --  | Ano Term
+  deriving (Show, Eq)
 data Type
   = TyUnit
   | TyBool
@@ -59,11 +63,12 @@ gateInfos =
   , ("discard", WtBit, WtUnit)
   , ("H", WtQubit, WtQubit)
   , ("X", WtQubit, WtQubit)
+  , ("Z", WtQubit, WtQubit)
   , ("CNOT", WtProd WtQubit WtQubit, WtProd WtQubit WtQubit)
   ]
 
 singleUnitaryGates :: [String]
-singleUnitaryGates = ["H", "X"]
+singleUnitaryGates = ["H", "X", "Z"]
 
 gateNames :: [String]
 gateNames = map (\(a, _, _) -> a) gateInfos

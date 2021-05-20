@@ -11,7 +11,7 @@ import Syntax
 
 langDef :: Tok.LanguageDef st
 langDef = emptyDef
-    { Tok.commentLine = "QwQ"
+    { Tok.commentLine = "--"
     , Tok.reservedOpNames = ops
     , Tok.reservedNames = names
     }
@@ -25,6 +25,7 @@ langDef = emptyDef
           , "<-" -- pattern binding
           , "<-|" -- variable binding (lift)
           , "()"
+          , "="
           ]
     names = [ "unit"
             , "true"
@@ -44,6 +45,7 @@ langDef = emptyDef
             , "lift"
             , "capp", "to"
             , "G"
+            , "fun"
             ] ++ gateNames
 
 lexer :: Tok.GenTokenParser String u Identity

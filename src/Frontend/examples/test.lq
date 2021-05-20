@@ -1,0 +1,9 @@
+fun teleport = / q : Qubit .
+  (a, b) <- capp (/ () : One . output ()) to ();
+  (x, y) <- capp (/ () : One . output ()) to (q, a);
+  output ()
+
+fun bob = / ((w1, w2), q) : (Bit # Bit) # Qubit .
+    (x1,x2) <-| lift (w1,w2);
+    q <- capp (if x2 then (/ t : Qubit . t <- gate X t; output t) else (/ t : Qubit . output t)) to q;
+    capp (if x2 then (/ t : Qubit . t <- gate Z t; output t) else (/ t : Qubit . output t)) to q

@@ -7,7 +7,7 @@
 / (x, y) : Bit # Bit . output (y, x)
 
 \ c : Qubit ~> Qubit . / w : Qubit . capp c to w
-/ w : Bit . capp (/ a : Bit . output a)
+/ w : Bit . capp (/ a : Bit . output a) to w
 / () : One . (w <- gate init1 () ; capp (/ a : Qubit . output a) to w)
 \ x : Bool . if x then run (w <- gate init1 () ; capp (/ a : Qubit . output a) to w) else false
 

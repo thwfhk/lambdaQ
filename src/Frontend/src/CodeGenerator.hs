@@ -171,6 +171,7 @@ circ2QASM (CcLift x p c) = do
 circ2QASM (CcApp t p') = case t of
   TmCir _ _ _ -> tmCir2QASM t p'
   TmIf _ _ _ -> tmIf2QASM t p'
+  -- TmVar x _ -> throwError $ "Currently Not Supported! [" ++ show x ++ "]"
   x -> throwError $ "circ2QASM CcApp : syntax " ++ show x ++ " not supported"
 
 tmCir2QASM :: Term -> Pattern -> ExceptT Err (State StateCG) (Program, Pattern)

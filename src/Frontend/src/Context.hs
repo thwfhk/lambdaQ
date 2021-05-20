@@ -87,7 +87,7 @@ index2entry :: [(Name, b)] -> Int -> Either Err (Name, b)
 index2entry ctx x
   | length ctx > x = Right $ ctx !! x
   | otherwise = Left $ "getIndex: index " ++ show x
-              ++ "is overflow, current length: " ++ show (length ctx)
+              ++ " is overflow, current length: " ++ show (length ctx)
 
 -- helper functions for interacting with Contexts State
 getfst :: MonadState (c1, c2) m => m c1
