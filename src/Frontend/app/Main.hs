@@ -6,7 +6,8 @@ import Syntax
 import Context
 import TypeChecker
 import CodeGenerator
-import QASMPrinter
+import QASMSyntax
+import PrettyPrinter
 import Text.Parsec
 import Control.Monad.Except
 import Control.Monad.State
@@ -34,11 +35,11 @@ repl = do
       let mty = runQwQ emptyctxs $ typeOf term
       case mty of
         Right ty -> putStrLn $ "[Type SUCCESS 🥳]:\n  " ++ show ty
-        Left e -> putStrLn $ "[Type FAIL 😵]: " ++ e
+        Left e -> putStrLn $ "[Type FAILED 😵]: " ++ e
       let mqasm = runQwQ emptystate $ term2QASM term
       case mqasm of
-        Right qasm -> putStrLn $ "[Generation SUCCESS 🥳]:\n  " ++ show qasm ++ "\n" ++ printQASM qasm
-        Left e -> putStrLn $ "[Generation FAIL 😵]: " ++ e
+        Right (qasm, _) -> putStrLn $ "[Generation SUCCESS 🥳]:\n  " ++ show qasm ++ "\n" ++ printQASM qasm
+        Left e -> putStrLn $ "[Generation FAILED 😵]: " ++ e
   putStrLn ""
   repl
 
@@ -50,12 +51,17 @@ main = do
       sourceFile <- readFile sourceFileName
       -- print $ "Source: " ++ sourceFile
       case (runMyParser sourceFileName emptyctxs sourceFile) of
-        Left err -> print err
+        Left err -> putStrLn $ "[Parse FAILED 😵]: " ++ show err
         Right cmds -> do
+          putStrLn $ "[Parse SUCCESS 🥳]: " ++ show (length cmds) ++ " functions founded."
           case (typeInference cmds) of
-            Left err -> print err
-            Right tys -> print tys
-          -- return ()
+            Left err -> putStrLn $ "[Type FAILED 😵]: " ++ err
+            Right tys -> do
+              putStrLn $ "[Type SUCCESS 🥳]:"
+              mapM_ (\ ((Def s _), ty) -> putStrLn $ "  " ++ s ++ " : " ++ printType ty) (zip cmds tys)
+          case (codeGeneration cmds) of
+            Left err -> putStrLn $ "[Generation FAILED 😵]: " ++ err
+            Right qasm -> putStrLn $ "[Generation SUCCESS 🥳]:\n" ++ printQASM qasm
     _ -> putStrLn "source-file name not founded, enter REPL" >> repl
 
 typeInference :: [Command] -> Either Err [Type]
@@ -70,5 +76,8 @@ typeInference = fst . foldl tyinf (Right [], emptyctxs)
                     Left err -> (Left ("Definition " ++ x ++ " error: " ++ err), ctxs)
                     Right ty -> (Right (tys ++ [ty]), (addBinding gamma (x, VarBind ty), omega))
 
--- codeGeneration :: [Command] -> Either Err Program
--- codeGeneration cmds = let main = findmain cmds in 
+codeGeneration :: [Command] -> Either Err Program
+codeGeneration cmds =
+  let declarations = map (\ (Def name t) -> (name, Right t)) (reverse $ init cmds)
+  in let Def _ t = last cmds
+  in fst <$> (runQwQ (emptyregs, declarations) $ term2QASM t)

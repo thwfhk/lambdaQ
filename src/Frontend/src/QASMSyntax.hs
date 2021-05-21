@@ -25,6 +25,7 @@ data Uop
   = UCX Argument Argument  -- CX <argument>, <argument>
   | UX Argument
   | UH Argument
+  | UZ Argument
   deriving Show
 
 type Argument = String
@@ -36,3 +37,4 @@ type Argument = String
 getSingleUop :: String -> String -> Uop
 getSingleUop "X" s = UX s
 getSingleUop "H" s = UH s
+getSingleUop "Z" s = UZ s

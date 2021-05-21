@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7835f03d161af71243b808a586110f2abf737e5167d62ea189e860262927ab57
+-- hash: 3f8cfe4af0955b4ac08c201049531eeb47c755b1fa2a9c3f33c82e7622b5a863
 
 name:           Frontend
 version:        0.1.0.0
@@ -32,7 +32,7 @@ library
       DeBruijn
       Lexer
       Parser
-      QASMPrinter
+      PrettyPrinter
       QASMSyntax
       Syntax
       TypeChecker

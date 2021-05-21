@@ -44,7 +44,6 @@ langDef = emptyDef
             , "gate"
             , "lift"
             , "capp", "to"
-            , "G"
             , "fun"
             ] ++ gateNames
 

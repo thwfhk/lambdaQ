@@ -17,10 +17,12 @@ type Registers = (Mapping, Int)
 -- We make use of the De Bruijn index of term variables here:
 -- we add vars into it whenever we encounter an abstraction,
 -- and when we need to find a corresponding bitvar, we just use the index.
-type Variables = [(Name, Maybe Name)] -- boolvar name |-> bitvar name
+type Variables = [(Name, Either Name Term)] -- boolvar name |-> bitvar name | function
 type StateCG = (Registers, Variables)
+emptyregs :: Registers
+emptyregs = (Map.empty, 0)
 emptystate :: StateCG
-emptystate = ((Map.empty, 0), [])
+emptystate = (emptyregs, [])
 
 -- instance MonadState StateCG m => MonadState (Mapping, Int) m where
 --   get = getfst
@@ -72,7 +74,7 @@ addPatBitvar :: MonadError Err m => Variables -> (Pattern, Pattern) -> m Variabl
 addPatBitvar vars (patvar, ty) = case patvar of
   PtEmp -> return vars
   PtName name -> case ty of
-    PtName x -> return $ addBinding vars (name, Just x)
+    PtName x -> return $ addBinding vars (name, Left x)
     _ -> throwError $ "addPatBitvar: lift mismatch"
   PtProd p1 p2 -> case ty of
     PtProd t1 t2 -> do
@@ -81,12 +83,8 @@ addPatBitvar vars (patvar, ty) = case patvar of
     _ -> throwError $ "addPatBitvar: lift mismatch"
 
 -- NOTE: I think that using GADT to define Term is better
-term2QASM :: Term -> ExceptT Err (State StateCG) Program
-term2QASM (TmCir p wt c) = case wt of
-  WtUnit -> do
-    (prog, _) <- circ2QASM c
-    return prog
-  _ -> throwError $ "term2QASM : not supported currently"
+term2QASM :: Term -> ExceptT Err (State StateCG) (Program, Pattern)
+term2QASM (TmCir p wt c) = circ2QASM c
 term2QASM _ = throwError $ "term2QASM : not supported currently"
 
 circ2QASM :: Circ -> ExceptT Err (State StateCG) (Program, Pattern) -- QASM Program and return value
@@ -171,7 +169,7 @@ circ2QASM (CcLift x p c) = do
 circ2QASM (CcApp t p') = case t of
   TmCir _ _ _ -> tmCir2QASM t p'
   TmIf _ _ _ -> tmIf2QASM t p'
-  -- TmVar x _ -> throwError $ "Currently Not Supported! [" ++ show x ++ "]"
+  TmVar x _ -> funcDef2QASM x p'
   x -> throwError $ "circ2QASM CcApp : syntax " ++ show x ++ " not supported"
 
 tmCir2QASM :: Term -> Pattern -> ExceptT Err (State StateCG) (Program, Pattern)
@@ -196,10 +194,10 @@ tmIf2QASM t p' = case t of
       vars <- getsnd
       let (_, bitvar) = vars !! x
       case bitvar of
-        Just s -> if outpat2 /= outpat3 -- outpat2 and outpat3 need to be the same
+        Left s -> if outpat2 /= outpat3 -- outpat2 and outpat3 need to be the same
                   then throwError $ "tmIf2QASM : different output patterns"
                   else return (generateIf s 1 mqop2 ++ generateIf s 0 mqop3, outpat2)
-        Nothing -> throwError $ "tmIf2QASM : if condition is not a bool var"
+        _ -> throwError $ "tmIf2QASM : if condition is not a bool var"
     TmNot (TmVar x _) -> do
       (prog2, outpat2) <- tmCir2QASM t2 p'
       (prog3, outpat3) <- tmCir2QASM t3 p'
@@ -208,10 +206,10 @@ tmIf2QASM t p' = case t of
       vars <- getsnd
       let (_, bitvar) = vars !! x
       case bitvar of
-        Just s -> if outpat2 /= outpat3 -- outpat2 and outpat3 need to be the same
+        Left s -> if outpat2 /= outpat3 -- outpat2 and outpat3 need to be the same
                   then throwError $ "tmIf2QASM : different output patterns"
                   else return (generateIf s 0 mqop2 ++ generateIf s 1 mqop3, outpat2)
-        Nothing -> throwError $ "tmIf2QASM : if condition is not a bool var"
+        _ -> throwError $ "tmIf2QASM : if condition is not a bool var"
   where
     checkIf :: (MonadState StateCG m, MonadError Err m) => Program -> m (Maybe Qop)
     checkIf prog = case prog of
@@ -222,3 +220,17 @@ tmIf2QASM t p' = case t of
     generateIf s x mqop = case mqop of
       Just qop -> [SmIf s x qop]
       Nothing -> []
+
+funcDef2QASM :: Int -> Pattern -> ExceptT Err (State StateCG) (Program, Pattern)
+funcDef2QASM funcInd p = do
+  vars <- getsnd
+  let (_, Right tf) = vars !! funcInd
+  let TmCir tfp _ _ = tf
+  (regs, cnt) <- getRegs
+  putRegs (Map.empty, cnt)
+  -- traceM $ "func: " ++ show tfp ++ "\nregs: " ++ show (var2reg regs p)
+  addMappings tfp (var2reg regs p)
+  (prog, outpat) <- term2QASM tf
+  (_, newcnt) <- getRegs
+  putRegs (regs, newcnt)
+  return (prog, outpat)
