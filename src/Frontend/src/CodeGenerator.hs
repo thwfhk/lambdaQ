@@ -17,7 +17,8 @@ type Registers = (Mapping, Int)
 -- We make use of the De Bruijn index of term variables here:
 -- we add vars into it whenever we encounter an abstraction,
 -- and when we need to find a corresponding bitvar, we just use the index.
-type Variables = [(Name, Either Name Term)] -- boolvar name |-> bitvar name | function
+-- boolvar name |-> bitvar name, var |-> function
+type Variables = [(Name, Either Name Term)]
 type StateCG = (Registers, Variables)
 emptyregs :: Registers
 emptyregs = (Map.empty, 0)
@@ -82,7 +83,6 @@ addPatBitvar vars (patvar, ty) = case patvar of
       addPatBitvar vars' (p2, t2)
     _ -> throwError $ "addPatBitvar: lift mismatch"
 
--- NOTE: I think that using GADT to define Term is better
 term2QASM :: Term -> ExceptT Err (State StateCG) (Program, Pattern)
 term2QASM (TmCir p wt c) = circ2QASM c
 term2QASM _ = throwError $ "term2QASM : not supported currently"
@@ -169,7 +169,7 @@ circ2QASM (CcLift x p c) = do
 circ2QASM (CcApp t p') = case t of
   TmCir _ _ _ -> tmCir2QASM t p'
   TmIf _ _ _ -> tmIf2QASM t p'
-  TmVar x _ -> funcDef2QASM x p'
+  TmVar ind funcName -> funcDef2QASM funcName p' -- currently, all vars are global functions
   x -> throwError $ "circ2QASM CcApp : syntax " ++ show x ++ " not supported"
 
 tmCir2QASM :: Term -> Pattern -> ExceptT Err (State StateCG) (Program, Pattern)
@@ -221,16 +221,18 @@ tmIf2QASM t p' = case t of
       Just qop -> [SmIf s x qop]
       Nothing -> []
 
-funcDef2QASM :: Int -> Pattern -> ExceptT Err (State StateCG) (Program, Pattern)
-funcDef2QASM funcInd p = do
+funcDef2QASM :: String -> Pattern -> ExceptT Err (State StateCG) (Program, Pattern)
+funcDef2QASM funcName p = do
   vars <- getsnd
-  let (_, Right tf) = vars !! funcInd
-  let TmCir tfp _ _ = tf
-  (regs, cnt) <- getRegs
-  putRegs (Map.empty, cnt)
-  -- traceM $ "func: " ++ show tfp ++ "\nregs: " ++ show (var2reg regs p)
-  addMappings tfp (var2reg regs p)
-  (prog, outpat) <- term2QASM tf
-  (_, newcnt) <- getRegs
-  putRegs (regs, newcnt)
-  return (prog, outpat)
+  case name2entry vars funcName of
+    Left e -> throwError $ "funcDef2QASM : " ++ e
+    Right (_, Right tf) -> do
+      let TmCir tfp _ _ = tf
+      (regs, cnt) <- getRegs
+      putRegs (Map.empty, cnt)
+      -- traceM $ "func: " ++ show tfp ++ "\nregs: " ++ show (var2reg regs p)
+      addMappings tfp (var2reg regs p)
+      (prog, outpat) <- term2QASM tf
+      (_, newcnt) <- getRegs
+      putRegs (regs, newcnt)
+      return (prog, outpat)

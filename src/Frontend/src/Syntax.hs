@@ -13,7 +13,7 @@ data Type
   deriving (Show, Eq)
 
 data Term
-  = TmVar Int Int
+  = TmVar Int String -- De Bruijn index, name
   | TmUnit
   | TmTrue
   | TmFalse

@@ -12,17 +12,23 @@ fun alice = / (q, a) : Qubit # Qubit .
   q <- gate H q;
   x <- gate meas q;
   y <- gate meas a;
+  (q, w) <- capp bell00 to ();
+  q <- gate meas q;
+  () <- gate discard q;
+  w <- gate meas w;
+  () <- gate discard w;
   output (x,y)
 
 -- bob : Circ(bit ⊗ bit ⊗ qubit, qubit)
 fun bob = / ((w1, w2), q) : Bit # Bit # Qubit .
     (x1,x2) <-| lift (w1,w2);
     q <- capp (if x2 then (/ t : Qubit . t <- gate X t; output t) else (/ t : Qubit . output t)) to q;
-    capp (if x2 then (/ t : Qubit . t <- gate Z t; output t) else (/ t : Qubit . output t)) to q
+    capp (if x1 then (/ t : Qubit . t <- gate Z t; output t) else (/ t : Qubit . output t)) to q
 
 -- teleport : Circ(qubit, qubit)
-fun teleport = / q : Qubit .
+-- teleport : Circ(1, qubit)
+fun teleport = / () : One .
+  q <- gate init0 ();
   (a, b) <- capp bell00 to ();
-  output ((a, b), q)
--- (x, y) <- capp alice to (q, a);
--- capp bob to ((x, y), b);
+  (x, y) <- capp alice to (q, a);
+  capp bob to ((x, y), b);

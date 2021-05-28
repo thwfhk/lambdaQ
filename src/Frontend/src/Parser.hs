@@ -115,7 +115,7 @@ parseVar = do
   var <- identifier
   ctx <- getFst
   case name2index ctx var of -- the only use of context during parsing
-    Right idx -> return $ TmVar idx (length ctx)
+    Right idx -> return $ TmVar idx var
     Left e -> error e
 
 parseAbs :: Parser Term
