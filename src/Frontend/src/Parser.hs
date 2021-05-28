@@ -237,6 +237,13 @@ parseGateApp = do
   setSnd ctx
   return $ CcGate pat2 gate pat1 circ
 
+parseGateSugar :: Parser Circ
+parseGateSugar = do
+  reserved "gate"
+  gate <- parseGate
+  pat <- parsePattern
+  return $ CcGateS gate pat
+
 parseComp :: Parser Circ
 parseComp = do
   pat <- parsePattern
@@ -294,6 +301,7 @@ parseCirc = (whiteSpace >>) $
   <|> try parseLift
   <|> try parseGateApp
   <|> try parseComp
+  <|> try parseGateSugar
   <|> parens parseCirc
 
 ----------------------------------------------------------------

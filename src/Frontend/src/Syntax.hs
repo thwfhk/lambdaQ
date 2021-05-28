@@ -34,6 +34,7 @@ data Circ
   | CcComp Pattern Circ Circ
   | CcLift Pattern Pattern Circ
   | CcApp Term Pattern
+  | CcGateS Gate Pattern -- a syntactic sugar
   deriving (Show, Eq)
 
 data Wtype

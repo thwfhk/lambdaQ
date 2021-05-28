@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3f8cfe4af0955b4ac08c201049531eeb47c755b1fa2a9c3f33c82e7622b5a863
+-- hash: 0b7495ce7b9ed6f1e206e093656a4a5ae12d935065202d9dc658c4882be0a446
 
 name:           Frontend
 version:        0.1.0.0
@@ -30,6 +30,7 @@ library
       CodeGenerator
       Context
       DeBruijn
+      Desugar
       Lexer
       Parser
       PrettyPrinter

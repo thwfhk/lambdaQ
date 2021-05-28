@@ -17,10 +17,9 @@ fun alice = / (q, a) : Qubit # Qubit .
 -- bob : Circ(bit ⊗ bit ⊗ qubit, qubit)
 fun bob = / ((w1, w2), q) : Bit # Bit # Qubit .
     (x1,x2) <-| lift (w1,w2);
-    q <- capp (if x2 then (/ t : Qubit . t <- gate X t; output t) else (/ t : Qubit . output t)) to q;
-    capp (if x1 then (/ t : Qubit . t <- gate Z t; output t) else (/ t : Qubit . output t)) to q
+    q <- capp (if x2 then (/ t : Qubit . gate X t) else (/ t : Qubit . output t)) to q;
+    capp (if x1 then (/ t : Qubit . gate Z t) else (/ t : Qubit . output t)) to q
 
--- teleport : Circ(qubit, qubit)
 -- teleport : Circ(1, qubit)
 fun teleport = / () : One .
   q <- gate init0 ();

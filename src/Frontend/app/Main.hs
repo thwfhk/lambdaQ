@@ -4,6 +4,7 @@ import Lexer
 import Parser
 import Syntax
 import Context
+import Desugar
 import TypeChecker
 import CodeGenerator
 import QASMSyntax
@@ -53,16 +54,21 @@ main = do
       case (runMyParser sourceFileName emptyctxs sourceFile) of
         Left err -> putStrLn $ "[Parse FAILED 😵]: " ++ show err
         Right cmds -> do
-          putStrLn $ "[Parse SUCCESS 🥳]: " ++ show (length cmds) ++ " functions founded."
-          case (typeInference cmds) of
+          putStrLn $ "[Parse SUCCESS 🥳]: " ++ show (length cmds)
+            ++ " function" ++ if length cmds == 1 then "" else "s" ++ " founded."
+          let cmds' = deSugar cmds
+          case (typeInference cmds') of
             Left err -> putStrLn $ "[Type FAILED 😵]: " ++ err
             Right tys -> do
               putStrLn $ "[Type SUCCESS 🥳]:"
               mapM_ (\ ((Def s _), ty) -> putStrLn $ "  " ++ s ++ " : " ++ printType ty) (zip cmds tys)
-          case (codeGeneration cmds) of
+          case (codeGeneration cmds') of
             Left err -> putStrLn $ "[Generation FAILED 😵]: " ++ err
             Right qasm -> putStrLn $ "[Generation SUCCESS 🥳]:\n" ++ printQASM qasm
     _ -> putStrLn "source-file name not founded, enter REPL" >> repl
+
+deSugar :: [Command] -> [Command]
+deSugar = map (\ (Def s t) -> Def s (desugar t))
 
 typeInference :: [Command] -> Either Err [Type]
 typeInference = fst . foldl tyinf (Right [], emptyctxs) 
