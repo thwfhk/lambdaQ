@@ -59,28 +59,32 @@ main = do
           let cmds' = deSugar cmds
           case (typeInference cmds') of
             Left err -> putStrLn $ "[Type FAILED 😵]: " ++ err
-            Right tys -> do
+            Right tycms -> do
               putStrLn $ "[Type SUCCESS 🥳]:"
-              mapM_ (\ ((Def s _), ty) -> putStrLn $ "  " ++ s ++ " : " ++ printType ty) (zip cmds tys)
-          case (codeGeneration cmds') of
-            Left err -> putStrLn $ "[Generation FAILED 😵]: " ++ err
-            Right qasm -> putStrLn $ "[Generation SUCCESS 🥳]:\n" ++ printQASM qasm
+              let tys = map fst tycms
+              let cmds'' = map snd tycms
+              mapM_ (\ ((Def s _), ty) -> putStrLn $ "  " ++ s ++ " : " ++ printType ty) (zip cmds'' tys)
+              case (codeGeneration cmds'') of
+                Left err -> putStrLn $ "[Generation FAILED 😵]: " ++ err
+                Right qasm -> putStrLn $ "[Generation SUCCESS 🥳]:\n" ++ printQASM qasm
     _ -> putStrLn "source-file name not founded, enter REPL" >> repl
 
 deSugar :: [Command] -> [Command]
 deSugar = map (\ (Def s t) -> Def s (desugar t))
 
-typeInference :: [Command] -> Either Err [Type]
+typeInference :: [Command] -> Either Err [(Type, Command)]
 typeInference = fst . foldl tyinf (Right [], emptyctxs) 
   where
-    tyinf :: (Either Err [Type], Contexts) -> Command -> (Either Err [Type], Contexts)
+    tyinf :: (Either Err [(Type, Command)], Contexts) -> Command
+          -> (Either Err [(Type, Command)], Contexts)
     tyinf (mtys, ctxs@(gamma, omega)) cmd = case mtys of
       Left err -> (Left err, ctxs)
       Right tys -> case cmd of
-        Def x t -> let mty = runQwQ ctxs (typeOf t)
-                   in case mty of
+        Def x t -> let mtytm = runQwQ ctxs (typeOf t)
+                   in case mtytm of
                     Left err -> (Left ("Definition " ++ x ++ " error: " ++ err), ctxs)
-                    Right ty -> (Right (tys ++ [ty]), (addBinding gamma (x, VarBind ty), omega))
+                    Right (ty, nt) -> ( Right (tys ++ [(ty, Def x nt)])
+                                      , (addBinding gamma (x, VarBind ty), omega))
 
 codeGeneration :: [Command] -> Either Err Program
 codeGeneration cmds =

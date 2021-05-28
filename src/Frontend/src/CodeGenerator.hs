@@ -160,17 +160,41 @@ circ2QASM (CcComp p c1 c2) = do
 circ2QASM (CcLift x p c) = do
   -- We need to maintain the De Bruijn index here
   current@((regs, cnt), vars) <- get
-  let regbitvar = var2reg regs p
-  addPatBitvar vars (x, regbitvar) >>= setsnd
-  -- TODO: if the wtype of p is QuBit, we need to add a measure statement
+  let pwo2 = removeLast2 p
+  let regbitvar = var2reg regs pwo2
+  (prog, regbitvar') <- genMeasure regbitvar p
+  addPatBitvar vars (x, regbitvar') >>= setsnd -- regbitvar' contains bitvars
   (prog', outpat) <- circ2QASM c
   put current
-  return (prog', outpat)
+  return (prog ++ prog', outpat)
 circ2QASM (CcApp t p') = case t of
   TmCir _ _ _ -> tmCir2QASM t p'
   TmIf _ _ _ -> tmIf2QASM t p'
   TmVar ind funcName -> funcDef2QASM funcName p' -- currently, all vars are global functions
   x -> throwError $ "circ2QASM CcApp : syntax " ++ show x ++ " not supported"
+
+lastN :: Int -> [a] -> [a]
+lastN n xs = foldl' (const . drop 1) xs (drop n xs)
+
+removeLastN :: Int -> [a] -> [a]
+removeLastN n xs = take (length xs - n) xs
+
+removeLast2 :: Pattern -> Pattern
+removeLast2 PtEmp = PtEmp
+removeLast2 (PtName s) = PtName (removeLastN 2 s)
+removeLast2 (PtProd p1 p2) = PtProd (removeLast2 p1) (removeLast2 p2)
+
+genMeasure :: Pattern -> Pattern -> ExceptT Err (State StateCG) (Program, Pattern)
+genMeasure PtEmp PtEmp = return ([], PtEmp)
+genMeasure (PtName r) (PtName s) =
+  if lastN 2 s == "@Q" then do
+    r' <- pickNewReg
+    return ([SmQop (Measure r r')], PtName r')
+  else return ([], PtName r)
+-- genMeasure (PtProd p1 p2) = do
+--   (prog1, np1) <- genMeasure p1
+--   (prog2, np2) <- genMeasure p2
+--   return (prog1 ++ prog2, PtProd np1 np2)
 
 tmCir2QASM :: Term -> Pattern -> ExceptT Err (State StateCG) (Program, Pattern)
 tmCir2QASM t p' = case t of

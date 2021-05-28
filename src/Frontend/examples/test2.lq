@@ -1,9 +1,6 @@
--- candyqwq : Circ(1, bit ⊗ bit)
-fun candyqwq = / () : One .
-  q <- gate init0 ();
-  a <- gate init0 ();
-  (q, a) <- gate CNOT (q, a);
-  q <- gate H q;
-  x <- gate meas q;
-  y <- gate meas a;
-  output (x,y)
+fun test = / () : One .
+    w <- gate new0 ();
+    x <-| lift w;
+    q <- gate init0 ();
+    -- capp (if x then (/ t : Qubit . t <- gate X t; output t) else (/ t : Qubit . output t)) to q
+    capp (if x then (/ t : Qubit . gate X t) else (/ t : Qubit . output t)) to q
