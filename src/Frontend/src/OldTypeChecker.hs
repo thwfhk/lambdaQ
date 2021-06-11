@@ -1,5 +1,5 @@
-{-# LANGUAGE FlexibleContexts, TupleSections #-}
-module TypeChecker where
+{-# LANGUAGE FlexibleContexts #-}
+module OldTypeChecker where
 
 import Syntax
 import Context
@@ -22,64 +22,64 @@ wtype2type WtQubit = TyBool
 wtype2type (WtProd wt1 wt2) = TyProd (wtype2type wt1) (wtype2type wt2)
 
 -- | type inference for Γ |- t : T
-typeOf :: Term -> ExceptT String (State Contexts) (Type, Term)
-typeOf sar@TmUnit = return (TyUnit, sar)
-typeOf sar@TmTrue = return (TyBool, sar)
-typeOf sar@TmFalse = return (TyBool, sar)
-typeOf sar@(TmVar x _) = do
+typeOf :: Term -> ExceptT String (State Contexts) Type
+typeOf TmUnit = return TyUnit
+typeOf TmTrue = return TyBool
+typeOf TmFalse = return TyBool
+typeOf (TmVar x _) = do
   gamma <- getfst
   bty <- snd <$> index2entryGamma x
   case bty of
-    VarBind ty -> return (ty, sar)
+    VarBind ty -> return ty
     _ -> throwError $ "typeof TmVar: not a VarBind"
 typeOf (TmAbs var ty tm) = do
   ctx <- getfst
   setfst $ addBinding ctx (var, VarBind ty)
-  (ty2, ntm) <- typeOf tm
-  return $ (TyArr ty ty2, TmAbs var ty ntm)
+  ty2 <- typeOf tm
+  return $ TyArr ty ty2
 typeOf (TmApp t1 t2) = do
-  (ty1, nt1) <- typeOf t1
-  (ty2, nt2) <- typeOf t2
+  ty1 <- typeOf t1
+  ty2 <- typeOf t2
   case ty1 of
     TyArr ty11 ty12 ->
-      if ty11 == ty2 then return (ty12, TmApp nt1 nt2)
+      if ty11 == ty2 then return ty12
       else throwError $ "typeOf TmApp: parameter type not match"
     _ -> throwError $ "typeOf TmApp: not a function"
 typeOf (TmProd t1 t2) = do
-  (ty1, nt1) <- typeOf t1
-  (ty2, nt2) <- typeOf t2
-  return (TyProd ty1 ty2, TmProd nt1 nt2)
+  ty1 <- typeOf t1
+  ty2 <- typeOf t2
+  return $ TyProd ty1 ty2
 typeOf (TmFst t) = do
-  (ty, nt) <- typeOf t
+  ty <- typeOf t
   case ty of
-    TyProd ty1 _ -> return (ty1, TmFst nt)
+    TyProd ty1 _ -> return ty1
     _ -> throwError $ "typeOf TmFst: not a product"
 typeOf (TmSnd t) = do
-  (ty, nt) <- typeOf t
+  ty <- typeOf t
   case ty of
-    TyProd _ ty2 -> return (ty2, TmSnd nt)
+    TyProd _ ty2 -> return ty2
     _ -> throwError $ "typeOf TmSnd: not a product"
 typeOf (TmNot t) = do
-  (ty, nt) <- typeOf t
+  ty <- typeOf t
   if ty /= TyBool then throwError $ "typeOf TmNot: not a boolean"
-  else return (TyBool, TmNot nt)
+  else return TyBool
 typeOf (TmIf t1 t2 t3) = do
-  (ty1, nt1) <- typeOf t1
+  ty1 <- typeOf t1
   if ty1 /= TyBool then throwError $ "typeOf TmIf: condition is not a boolean"
   else do
-    (ty2, nt2) <- typeOf t2
-    (ty3, nt3) <- typeOf t3
+    ty2 <- typeOf t2
+    ty3 <- typeOf t3
     if ty2 /= ty3 then throwError $ "typeOf TmIf: branches have different types"
-    else return (ty2, TmIf nt1 nt2 nt3)
+    else return ty2
 typeOf (TmRun c) = do
-  (wt, nc) <- wtypeOf c
-  return (wtype2type wt, TmRun nc)
+  wt <- wtypeOf c
+  return $ wtype2type wt
 typeOf (TmCir p wt c) = do
   ctx <- getsnd
   addPatWtypeBinding ctx (p, wt) >>= setsnd
-  (wtc, nc) <- wtypeOf c
+  wtc <- wtypeOf c
   setsnd ctx
-  return (TyCir wt wtc, TmCir p wt nc)
+  return $ TyCir wt wtc
 
 -- some utilities functions for operating lists
 -- | remove l2 from l1
@@ -164,7 +164,31 @@ opwCheck p wt = do
     else throwError $ "opwCheck error"
 
 -- | type inference for Γ ; Ω |- c : W
-wtypeOf :: Circ -> ExceptT String (State Contexts) (Wtype, Circ)
+wtypeOf :: Circ -> ExceptT String (State Contexts) Wtype
+wtypeOf (CcOutput p) = do
+  omega <- getsnd
+  patWtypeOf p
+wtypeOf (CcGate p2 g p1 c) = do
+  omega <- getsnd
+  (w1, w2) <- getGateType g
+  omega1 <- constructOmega p1 w1 emptyctx
+  let omega' = omega `remove` omega1 -- omega == omega' + omega1
+  omega2 <- constructOmega p2 w2 emptyctx
+  setsnd $ omega2 ++ omega'
+  w <- wtypeOf c
+  setsnd $ omega
+  return w
+wtypeOf (CcComp p c c') = do
+  omega <- getsnd
+  omega1 <- extractOmega (getOmegaNames c) omega
+  let omega2 = omega `remove` omega1 -- omega == omega1 + omega2
+  setsnd omega1
+  w <- wtypeOf c
+  omega' <- constructOmega p w emptyctx -- omega' |- p : w
+  setsnd $ omega2 ++ omega'
+  w' <- wtypeOf c'
+  setsnd $ omega
+  return w'
 wtypeOf (CcLift x p c) = do
   omega <- getsnd
   omegap <- extractOmega (namesInPattern p) omega
@@ -174,50 +198,18 @@ wtypeOf (CcLift x p c) = do
   gamma <- getfst
   addPatTypeBinding gamma (x, (wtype2type wtype)) >>= setfst
   -- setfst $ addBinding gamma (x, VarBind (wtype2type wtype))
-  (wtype', nc) <- wtypeOf c
+  wtype' <- wtypeOf c
   put (gamma, omega)
-  return (wtype', CcLift x (pairPattern p wtype) nc)
-wtypeOf sar@(CcOutput p) = do
-  omega <- getsnd
-  wty <- patWtypeOf p
-  return (wty, sar)
-wtypeOf (CcGate p2 g p1 c) = do
-  omega <- getsnd
-  (w1, w2) <- getGateType g
-  omega1 <- constructOmega p1 w1 emptyctx
-  let omega' = omega `remove` omega1 -- omega == omega' + omega1
-  omega2 <- constructOmega p2 w2 emptyctx
-  setsnd $ omega2 ++ omega'
-  (w, nc) <- wtypeOf c
-  setsnd $ omega
-  return (w, CcGate p2 g p1 nc)
-wtypeOf (CcComp p c c') = do
-  omega <- getsnd
-  omega1 <- extractOmega (getOmegaNames c) omega
-  let omega2 = omega `remove` omega1 -- omega == omega1 + omega2
-  setsnd omega1
-  (w, nc) <- wtypeOf c
-  omega' <- constructOmega p w emptyctx -- omega' |- p : w
-  setsnd $ omega2 ++ omega'
-  (w', nc') <- wtypeOf c'
-  setsnd $ omega
-  return (w', CcComp p nc nc')
+  return wtype'
 wtypeOf (CcApp t p) = do
   omega <- getsnd
   setsnd emptyctx -- omega needs to be cleared here
-  (ty, nt) <- typeOf t
+  ty <- typeOf t
   setsnd omega
   case ty of
     TyCir w1 w2 -> do
       opwCheck p w1
-      return (w2, CcApp nt p)
+      return w2
     _ -> throwError $ "wtypeOf CcApp: not a circuit function"
 
-pairPattern :: Pattern -> Wtype -> Pattern
-pairPattern pat wt = case pat of
-  PtEmp -> PtEmp
-  PtName name -> case wt of
-    WtBit -> PtName (name ++ "@B")
-    WtQubit -> PtName (name ++ "@Q")
-  PtProd p1 p2 -> case wt of
-    WtProd w1 w2 -> PtProd (pairPattern p1 w1) (pairPattern p2 w2)
+

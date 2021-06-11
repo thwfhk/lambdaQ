@@ -1,0 +1,28 @@
+-- bell00 : Circ(1, qubit ⊗ qubit)
+fun bell00 = / () : One .
+  a <- gate init0 ();
+  b <- gate init0 ();
+  a <- gate H a;
+  (a, b) <- gate CNOT (a, b);
+  output (a, b)
+
+-- alice : Circ(qubit ⊗ qubit, bit ⊗ bit)
+fun alice = / (q, a) : Qubit # Qubit .
+  (q, a) <- gate CNOT (q, a);
+  q <- gate H q;
+  x <- gate meas q;
+  y <- gate meas a;
+  output (x,y)
+
+-- bob : Circ(bit ⊗ bit ⊗ qubit, qubit)
+fun bob = / ((w1, w2), q) : Bit # Bit # Qubit .
+    (x1,x2) <-| lift (w1,w2);
+    q <- capp (if x2 then (/ t : Qubit . gate X t) else (/ t : Qubit . output t)) to q;
+    capp (if x1 then (/ t : Qubit . gate Z t) else (/ t : Qubit . output t)) to q
+
+-- teleport : Circ(1, qubit)
+fun teleport = / () : One .
+  q <- gate init0 ();
+  (a, b) <- capp bell00 to ();
+  (x, y) <- capp alice to (q, a);
+  capp bob to ((x, y), b);

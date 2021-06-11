@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2d15da547f96d2ed587705048dc3c98ced222d7a76e444ad1569398926f05d21
+-- hash: 30ca0b01ca591dcd1c8f4796577dcbed35c1065f39a7bc3df6ec369bb6a1e935
 
 name:           Frontend
 version:        0.1.0.0
@@ -27,18 +27,24 @@ source-repository head
 
 library
   exposed-modules:
+      CodeGenerator
       Context
+      DeBruijn
+      Desugar
       Lexer
-      Lib
+      OldTypeChecker
       Parser
+      PrettyPrinter
+      QASMSyntax
       Syntax
-      Typechecker
+      TypeChecker
   other-modules:
       Paths_Frontend
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , containers
     , mtl
     , parsec
   default-language: Haskell2010
@@ -53,6 +59,7 @@ executable Frontend-exe
   build-depends:
       Frontend
     , base >=4.7 && <5
+    , containers
     , mtl
     , parsec
   default-language: Haskell2010
@@ -68,6 +75,7 @@ test-suite Frontend-test
   build-depends:
       Frontend
     , base >=4.7 && <5
+    , containers
     , mtl
     , parsec
   default-language: Haskell2010

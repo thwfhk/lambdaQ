@@ -11,24 +11,26 @@ import Syntax
 
 langDef :: Tok.LanguageDef st
 langDef = emptyDef
-    { Tok.commentLine = "QwQ"
+    { Tok.commentLine = "--"
     , Tok.reservedOpNames = ops
     , Tok.reservedNames = names
     }
   where
-    ops = [ "*"
-          , "->"
-          , "~>"
+    ops = [ "*"  -- times
+          , "->" -- function
+          , "~>" -- circuit function
           , "\\" -- lambda
           , "/"  -- kappa
-          , "#" -- times
-          , "<-"
-          , "<="
+          , "#"  -- otimes
+          , "<-" -- pattern binding
+          , "<-|" -- variable binding (lift)
           , "()"
+          , "="
           ]
     names = [ "unit"
             , "true"
             , "false"
+            , "not"
             , "if"
             , "then"
             , "else"
@@ -42,6 +44,7 @@ langDef = emptyDef
             , "gate"
             , "lift"
             , "capp", "to"
+            , "fun"
             ] ++ gateNames
 
 lexer :: Tok.GenTokenParser String u Identity

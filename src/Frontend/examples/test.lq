@@ -1,0 +1,6 @@
+fun test = / () : One .
+    w <- gate init0 ();
+    x <-| lift w;
+    q <- gate init0 ();
+    -- capp (if x then (/ t : Qubit . t <- gate X t; output t) else (/ t : Qubit . output t)) to q
+    capp (if x then (/ t : Qubit . gate X t) else (/ t : Qubit . output t)) to q
