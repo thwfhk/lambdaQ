@@ -96,10 +96,15 @@ decl:
 	QREG ID LSPAREN NNINTEGER RSPAREN SEMICOLON
 	{
 		$$ = createNode(Q_DECL, 2, $2, $4);
+		// printf("in decl qreg %s, %s\n", $2->value, $4->value);
+		qmap[string($2->value)] = qcnt;
+		qcnt += atoi($4->value);
 	}
 	| CREG ID LSPAREN NNINTEGER RSPAREN SEMICOLON
 	{
 		$$ = createNode(C_DECL, 2, $2, $4);
+		cmap[string($2->value)] = ccnt;
+		ccnt += atoi($4->value);
 	};
 exp:
     PI 
@@ -243,6 +248,9 @@ uop:
 	| CX argument COMMA argument SEMICOLON
 	{
 		$$ = createNode(UOP_CX, 2, $2, $4);
+		//printf("cx %d %d\n", get_qid($2), get_qid($4));
+
+		Phi.push_back(Constraint(get_qid($2), get_qid($4), $$));
 	}
 	| ID anylist SEMICOLON
 	{
@@ -308,10 +316,11 @@ void yyerror(struct Node **, const char *s)	//当yacc遇到语法错误时，会
 {
 	cerr<<s<<endl;//直接输出错误信息
 }
+
  
 int main()//程序主函数，这个函数也可以放到其它.c, .cpp文件里
 {
-    yydebug = 1;
+    //yydebug = 1;
 
 	const char* sFile="test/file.txt";//打开要读取的文本文件
 	FILE* fp=fopen(sFile, "r");
@@ -327,7 +336,14 @@ int main()//程序主函数，这个函数也可以放到其它.c, .cpp文件里
 	struct Node* root;
     yyparse(&root);//使yacc开始读取输入和解析，它会调用lex的yylex()读取记号
 	puts("-----end parsing");
-    treePrint(root);
+    //treePrint(root);
+
+	printf("qcnt : %d\n", qcnt);
+	//printf("no cout: %d\n", qmap[string("cout")]);
+
+
+	qubit_allocation(Phi);
+
     generate(root);
 	fclose(fp);
  

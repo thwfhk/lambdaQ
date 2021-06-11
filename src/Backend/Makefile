@@ -6,8 +6,8 @@ VPATH = src
 SRC = src
 SUBDIRS = ./src
 
-$(OBJECT): parser.tab.c parser.tab.h lex.yy.c tree.c tree.h generator.c
-	$(CC) $(SRC)/tree.c $(SRC)/lex.yy.c $(SRC)/parser.tab.c $(SRC)/generator.c -o $(OBJECT)
+$(OBJECT): parser.tab.c parser.tab.h lex.yy.c tree.c tree.h generator.c qubit_allocation.c
+	$(CC) $(SRC)/tree.c $(SRC)/lex.yy.c $(SRC)/parser.tab.c $(SRC)/generator.c $(SRC)/qubit_allocation.c -o $(OBJECT)
 	@./$(OBJECT) #编译后立刻运行
 
 parser.tab.c parser.tab.h lex.yy.c: parser.y lex.l tree.h tree.c

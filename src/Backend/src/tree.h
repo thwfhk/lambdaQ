@@ -2,16 +2,35 @@
 #include <string>
 #include <stdio.h>//printf和FILE要用的
 #include <stdarg.h>
+#include <map>
+#include <vector>
+#include <algorithm>
+#include <queue>
+#include <cmath>
 
 using namespace std;
 
+#define MAXN 100
 struct Node
 {
     int tag;
+    int info; // 附加信息，对于cnot节点就表明它需要的Tranformation
     char* value;
  
     struct Node *cld[10];
     int ncld;
+};
+
+struct Constraint
+{
+    int u,v;
+    struct Node* nd;
+    Constraint(int u, int v, struct Node* nd): u(u), v(v), nd(nd) {}
+};
+
+struct Vertex{
+    int id;
+    int out_degree;
 };
  
 struct Node *createLeaf(int tag, char *text);
@@ -19,7 +38,18 @@ struct Node *createNode(int tag, int ncld, ...);
 // struct Node *createEmpty();
 void treePrint(struct Node * nd);
 void generate(struct Node * tree);
- 
+
+bool qubit_allocation(vector<Constraint> &Phi);
+
+int get_qid(struct Node *);
+int get_cid(struct Node *);
+
+
+extern map <string, int> qmap;
+extern map <string, int> cmap;
+extern int qcnt, ccnt; //记录当前使用的bit个数
+extern vector <Constraint> Phi;
+
 enum yyNTtype
 {
     HEADER = 400,

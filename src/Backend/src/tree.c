@@ -4,7 +4,10 @@
 #include <stdlib.h>
 #include <stdio.h>
  
- 
+map <string, int> qmap;
+map <string, int> cmap;
+int qcnt = 0, ccnt = 0; //记录当前使用的bit个数
+vector <Constraint> Phi;
 struct Node *createLeaf(int tag, char *text)
 {
 	struct Node *nd=(struct Node*)malloc(sizeof(struct Node));
@@ -68,4 +71,15 @@ void treePrintLevel(struct Node *nd, int lvl)
 void treePrint(struct Node *nd)
 {
 	treePrintLevel(nd, 0);
+}
+
+int get_qid(struct Node * x){
+	string id = x->cld[0]->value;
+	int n = atoi(x->cld[1]->value);
+	return qmap[id] + n;
+}
+int get_cid(struct Node * x){
+	string id = x->cld[0]->value;
+	int n = atoi(x->cld[1]->value);
+	return cmap[id] + n;
 }
