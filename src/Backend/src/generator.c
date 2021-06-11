@@ -4,6 +4,35 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+
+extern int nphy; //物理qubit总数
+extern Vertex vertex_phy[MAXN]; //physical qubits
+extern vector <int> h[MAXN]; //phsical qubit constraint graph
+extern vector <int> all_phy;
+extern int hcnt[MAXN][MAXN];
+ 
+extern int gcnt[MAXN][MAXN]; // logic qubit
+extern Vertex vertex_logic[MAXN]; // logic qubits
+extern vector <int> g[MAXN]; //logic qubit constraint graph
+extern queue <int> q; // used by bfs
+extern int visit[MAXN]; // 是否被bfs遍历过，同时也意味着是否被映射到一个物理qubit(因为只有被成功映射的logic qubit才会入队)
+extern int used[MAXN]; // phsical qubit是否被映射过
+
+extern int h_nd[MAXN][MAXN];//h的无向图版本
+extern int pre[MAXN]; //bfs中记录前驱节点
+
+extern int l[MAXN]; // allocaltion policy
+extern int l_inv[MAXN]; 
+
+extern int l_cur[MAXN]; // swap过后当前的l
+extern int l_cur_inv[MAXN];
+
+extern int freeze[MAXN]; // 为0 说明已经出现过，不能改变initial mapping
+
+
+int transform(int u, int v);
+
 void generate(struct Node * tree){
     switch(tree->tag)
     {
@@ -18,15 +47,19 @@ void generate(struct Node * tree){
             printf("OPENQASM ");
             generate(tree->cld[0]);
             printf(";\n");
+            printf("qreg q[%d];\n", qcnt);
             generate(tree->cld[1]);
             break;
         }
         case Q_DECL:{
+            /*
             printf("qreg ");
             generate(tree->cld[0]);
             printf("[");
             generate(tree->cld[1]);
-            printf("]\n");
+            printf("];\n");
+            */
+            // 不需要原来的声明
             break;
         }
         case C_DECL:{
@@ -34,7 +67,7 @@ void generate(struct Node * tree){
             generate(tree->cld[0]);
             printf("[");
             generate(tree->cld[1]);
-            printf("]\n");
+            printf("];\n");
             break;
         }
         case PLUS:{
@@ -132,7 +165,7 @@ void generate(struct Node * tree){
             break;
         }
         case UOP_U:{
-            printf("U(");
+            printf("u(");
             generate(tree->cld[0]);
             printf(") ");
             generate(tree->cld[1]);
@@ -140,11 +173,16 @@ void generate(struct Node * tree){
             break;
         }
         case UOP_CX:{
-            printf("CX ");
+            /*
+            printf("cx ");
             generate(tree->cld[0]);
             printf(", ");
             generate(tree->cld[1]);
             printf(";\n");
+            */
+            // printf("%d %d cx\n", get_qid(tree->cld[0]), get_qid(tree->cld[1]));
+            int u = get_qid(tree->cld[0]), v = get_qid(tree->cld[1]);
+            transform(u, v);
             break;
         }
         case OPAQUE:
