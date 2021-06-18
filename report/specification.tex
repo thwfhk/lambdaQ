@@ -1,99 +1,6 @@
-\documentclass[12pt]{article}
+\section{Specification of $\lambda_Q$}
 
-\usepackage[a4paper]{geometry}
-\geometry{left=2.0cm,right=2.0cm,top=2.5cm,bottom=2.5cm}
-
-\usepackage{comment}
-\usepackage{booktabs}
-\usepackage{graphicx}
-\usepackage{diagbox}
-\usepackage{amsmath,amsfonts,graphicx,amssymb,bm,amsthm}
-\usepackage{algorithm,algorithmicx}
-\usepackage[noend]{algpseudocode}
-\usepackage{fancyhdr}
-\usepackage{hyperref}
-\usepackage{fontspec}
-\usepackage{longtable}
-\usepackage{xcolor}
-\usepackage{newclude}
-
-%Includes "References" in the table of contents
-\usepackage[nottoc]{tocbibind}
-
-%Import the natbib package and sets a bibliography style
-\usepackage{natbib}
-
-% \setmonofont{Fira Code}
-% \setsansfont[BoldFont={Fira Sans Medium}]{Fira Sans Light}
-
-\newfontfamily{\lstfont}[Scale=.85]{Fira Sans}
-
-\hypersetup{hidelinks}
-
-\bibliographystyle{abbrvnat}
-\usepackage{authblk}
-
-% write inference rules
-\usepackage{proof}
-\usepackage{semantic}
-\usepackage{mathpartir}
-
-\newtheorem{Def}{Definition}
-\newtheorem{Thm}{Theorem}
-\newtheorem{Prop}{Proposition}
-\newtheorem{Proof}{Proof}
-
-% \usepackage{unicode-math}
-% \setmathfont{STIX Two Math}
-% 字体更换
-% \usepackage{newtxtext}
-% \usepackage{newtxmath}
-% \DeclareSymbolFont{CMlargesymbols}{OMX}{cmex}{m}{n}
-% \let\sumop\relax\let\prodop\relax
-% \DeclareMathSymbol{\sumop}{\mathop}{CMlargesymbols}{"50}
-% \DeclareMathSymbol{\prodop}{\mathop}{CMlargesymbols}{"51}
-
-% \usepackage{listings}
-% \definecolor{light-gray}{gray}{0.85}
-% \lstdefinelanguage{lambda}{%
-%   morekeywords={%
-%     if,then,else,fix,fun % keywords go here
-%   },%
-%   morekeywords={[2]Nat,Bool,Vector},   % types go here
-%   otherkeywords={}, % operators go here
-%   literate={% replace strings with symbols
-%     {->}{{$\to$}}{2}
-%     {lambda}{{$\lambda$}}{1}
-%     {Pi}{{$\Pi$}}{1}
-%     {Sigma}{{$\Sigma$}}{1}
-%     {n1}{{$n_1$}}{1}
-%     {n2}{{$n_2$}}{1}
-%     {v1}{{$v_1$}}{1}
-%     {v2}{{$v_2$}}{1}
-%   },
-%   basicstyle={\lstfont}, 
-%   keywordstyle={\bfseries},
-%   keywordstyle={[2]\itshape}, % style for types
-%   keepspaces,
-%   mathescape, 
-%   columns=fixed,
-%   backgroundcolor = \color{light-gray}
-% }[keywords,comments,strings]
-
-
-\title{The Definition of $\lambda_Q$}
-\author{}
-% \affil{Department of EECS\\ Peking University}
-\date{\today}
-
-\begin{document}
-
-\maketitle
-\tableofcontents
-
-\input{macro}
-
-\section{Syntax}
+\subsection{Syntax}
 
 \begin{longtable}[c]{lclr}
   % \caption{syntax}
@@ -187,7 +94,7 @@
   
 \end{longtable}
 
-\section{Typing Rules}
+\subsection{Typing Rules}
 First, we need to define what is a \textbf{well-formed wire context}.
 \begin{Def}[Well-formed Wire Contexts]
   A wire context $\Omega$ is well-formed, if there are no duplicate wire variables in it.
@@ -202,7 +109,7 @@ Since there are some different kinds of terms: ($\lambda$-)terms, wire patterns,
   \item $g : G$ is the typing relation for gates.
 \end{itemize}
 
-\subsection{Typing rules for gates}
+\subsubsection{Typing rules for gates}
 Note that since we only support built-in gates, the typing rules for gates are extremely simple, just assigning a type to each built-in gate.
 
 \noindent \textbf{Typing rules for gates}: $\boxed{g : G}$
@@ -216,7 +123,7 @@ Note that since we only support built-in gates, the typing rules for gates are e
   $ \infer{\discard : \calG(\Bit, \One)}{}$ & \\
 \end{longtable}
 
-\subsection{Typing rules for patterns}
+\subsubsection{Typing rules for patterns}
 
 \noindent \textbf{Typing rules for patterns}: $\boxed{\Omega \vdash p : W}$
 
@@ -227,7 +134,7 @@ Note that since we only support built-in gates, the typing rules for gates are e
   $ \infer{\Omega_1, \Omega_2 \vdash (p_1,p_2):W_1\otimes W_2}{\Omega_1 \vdash p_1 : W_1  &\Omega_2 \vdash p_2 : W_2} $ & \\
 \end{longtable}
 
-\subsection{Typing rules for circuits}
+\subsubsection{Typing rules for circuits}
 
 \noindent \textbf{Typing rules for circuits}: $\boxed{\Gamma;\Omega\vdash C:W}$
 
@@ -242,7 +149,7 @@ Note that since we only support built-in gates, the typing rules for gates are e
   
 \end{longtable}
 
-\subsection{Typing rules for terms}
+\subsubsection{Typing rules for terms}
 \noindent \textbf{Typing rules for ($\lambda$-)terms}: $\boxed{\Gamma\vdash t:T}$
 
 \renewcommand\arraystretch{3}
@@ -270,8 +177,3 @@ Note that since we only support built-in gates, the typing rules for gates are e
 %   $\infer{\Gamma\vdash t.2:[x\mapsto t.1]T}{\Gamma\vdash t:\Sigma x:S.T}$ &(T-PROJ2)\\
 %   $\infer{\Gamma\vdash t:T'}{\Gamma\vdash t:T &\Gamma\vdash T\equiv T'::*}$ &(T-CONV)\\
 % \end{longtable}
-
-\section{Operational Semantics}
-{\color{red} TODO: add semantics.}
-
-\end{document}

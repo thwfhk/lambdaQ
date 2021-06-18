@@ -1,0 +1,160 @@
+\documentclass[11pt]{article}
+% \usepackage{ctex}
+\usepackage{geometry}
+\usepackage{amsmath,amsfonts,graphicx,amssymb,bm,amsthm}
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\usepackage{natbib}
+\bibliographystyle{abbrv}
+\usepackage{lastpage}
+\usepackage{paralist}
+\usepackage{booktabs}
+\usepackage[colorlinks]{hyperref}
+\geometry{left=3.17cm, right=3.17cm, top=2.54cm, bottom=2.54cm} % A4纸
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{listings} % 代码
+% 替换部分符号
+\DeclareSymbolFont{CMlargesymbols}{OMX}{cmex}{m}{n}
+\let\sumop\relax\let\prodop\relax
+\DeclareMathSymbol{\sumop}{\mathop}{CMlargesymbols}{"50}
+\DeclareMathSymbol{\prodop}{\mathop}{CMlargesymbols}{"51}
+% 代码高亮
+\lstset{
+    language=C++,
+    numberstyle=\tiny,
+    basicstyle=\small\ttfamily,
+    stringstyle=\color{purple},
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{olive},
+    directivestyle=\color{blue},
+    frame=single,
+    rulesepcolor=\color{red!20!green!20!blue!20}
+}
+\usepackage{algorithm2e}
+% \usepackage{algorithm,algorithmicx}
+
+
+\usepackage{comment}
+\usepackage{diagbox}
+\usepackage[noend]{algpseudocode}
+\usepackage{fontspec}
+\usepackage{longtable}
+\usepackage{newclude}
+%Includes "References" in the table of contents
+\usepackage[nottoc]{tocbibind}
+% write inference rules
+\usepackage{proof}
+\usepackage{semantic}
+\usepackage{mathpartir}
+\usepackage{authblk}
+\usepackage{multicol}
+% \setmonofont{Fira Code}
+% \setsansfont[BoldFont={Fira Sans Medium}]{Fira Sans Light}
+\newfontfamily{\lstfont}[Scale=.85]{Fira Sans}
+
+\newtheorem{Def}{Definition}
+\newtheorem{Thm}{Theorem}
+\newtheorem{Prop}{Proposition}
+\newtheorem{Proof}{Proof}
+
+\setmainfont{Times}
+% \usepackage{unicode-math}
+% \setmathfont{STIX Two Math}
+% 字体更换
+% \usepackage{newtxtext}
+% \usepackage{newtxmath}
+
+% \usepackage{listings}
+% \definecolor{light-gray}{gray}{0.85}
+% \lstdefinelanguage{lambda}{%
+%   morekeywords={%
+%     if,then,else,fix,fun % keywords go here
+%   },%
+%   morekeywords={[2]Nat,Bool,Vector},   % types go here
+%   otherkeywords={}, % operators go here
+%   literate={% replace strings with symbols
+%     {->}{{$\to$}}{2}
+%     {lambda}{{$\lambda$}}{1}
+%     {Pi}{{$\Pi$}}{1}
+%     {Sigma}{{$\Sigma$}}{1}
+%     {n1}{{$n_1$}}{1}
+%     {n2}{{$n_2$}}{1}
+%     {v1}{{$v_1$}}{1}
+%     {v2}{{$v_2$}}{1}
+%   },
+%   basicstyle={\lstfont}, 
+%   keywordstyle={\bfseries},
+%   keywordstyle={[2]\itshape}, % style for types
+%   keepspaces,
+%   mathescape, 
+%   columns=fixed,
+%   backgroundcolor = \color{light-gray}
+% }[keywords,comments,strings]
+
+\usepackage{titling}% the wheel somebody else kindly made for us earlier
+\pretitle{% add some rules
+  \begin{center}
+    \fontsize{20}{22}\bfseries
+}%, make the fonts bigger, make the title (only) bold
+\posttitle{%
+  \end{center}%
+  \noindent\vrule height 1.5pt width \textwidth
+  \vskip .75em plus .25em minus .25em% increase the vertical spacing a bit, make this particular glue stretchier
+}
+
+\usepackage{titlesec}
+\titleformat{\section}
+  {\normalfont\fontsize{14}{17}\sffamily\bfseries}
+  {\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\fontsize{12}{17}\sffamily\bfseries\slshape}
+  {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalfont\fontsize{11}{17}\sffamily\bfseries\slshape}
+  {\thesubsubsection}{1em}{}
+
+\newcommand{\mycomment}[2]{{\small\color{magenta}\underline{\sf{#1}}:} {\color{magenta}{\small #2}}}
+
+\title{$\bm{\lambda_Q}$ : A Simple Quantum Programming Language}
+\author{
+  Wenhao Tang\quad 1800013088
+  % \texttt{first1.last1@xxxxx.com}
+  \\[1ex]
+  Xinzhao Wang\quad 1800013102
+  % \texttt{first2.last2@xxxxx.com}
+}
+\affil{Department of EECS\\ Peking University}
+\date{\today}
+
+\fancypagestyle{plain}{
+	\lhead{\small $\lambda_Q$ : A Simple Quantum Programming Language}
+	\chead{}
+	\rhead{}
+	\lfoot{\small Wenhao Tang, Xinzhao Wang}
+	\cfoot{}
+	\rfoot{\thepage\ / \ \pageref*{LastPage} }
+}
+\pagestyle{plain}
+
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\input{macro}
+
+\input{motivation}
+
+\input{specification}
+
+\input{frontend}
+
+\input{backend}
+
+\end{document}

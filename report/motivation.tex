@@ -1,0 +1,48 @@
+\section{Motivation}
+Quantum computing is getting more and more popular these days.
+\mycomment{twh}{Add some background of quantum computing here @wxz.}
+blah\\
+blah\\
+blah\\
+blah\\
+blah\\
+blah\\
+
+There are three main models of quantum computing: \textit{Quantum Turing Machine}, \textit{Quantum $\lambda$-Calculus} and \textit{Quantum Circuit}, among which the third one is the most practical.
+Most quantum programming languages are \textit{quantum-circuit description languages}, which means they are used to describe the architecture of quantum circuits.
+The current quantum programming languages can be categorized into two categories according to their styles: functional quantum programming languages and imperative quantum programming languages.
+\begin{multicols}{2}
+  \begin{center}
+      Functional:
+  \end{center}
+\begin{itemize}
+    \item Qwire
+    \item QML
+    \item Quipper
+    \item QuaFL
+    \item Silq
+\end{itemize}
+
+  \columnbreak
+
+  \begin{center}
+          Imperative:
+  \end{center}
+\begin{itemize}
+    \item QASM
+    \item QCL
+    \item ScaffCC
+    \item Qiskit
+    \item Quil
+\end{itemize}
+\end{multicols}
+
+Advanced quantum programming languages can use more powerful abstract constructs and type systems to make it easier for programmers to write correct quantum programs.
+In particular, we design a simple quantum programming language named $\lambda_Q$, which means $\lambda$-calculus with quantum circuit.
+Its syntax consists of a traditional part, which is a simple $\lambda$-calculus, and a quantum part, whose syntax is based on Qwire, a functional quantum programming language with linear type system.
+What's more, we implement a compiler from $\lambda_Q$ to QASM (Quantum Assembly Language), an imperative quantum programming language with low-level instruction sets.
+The output QASM program can be run on the IBM cloud quantum machine.
+
+The main feature of $\lambda_Q$ is that the syntax for traditional computation and quantum computation are separated.
+They communicate with each other via some specific operations : quantum circuit can be \textit{abstracted} or \textit{lifted (measured)} into traditional term, and traditional term for quantum circuit can be applied to quantum bits.
+Thus, the syntax of quantum circuit can use linear type system to guarantee that the Quantum Non-cloning Theorem is not violated, meanwhile the $\lambda$-calculus of the traditional part makes it easier to write quantum programs.
