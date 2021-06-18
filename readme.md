@@ -6,13 +6,15 @@ The name λQ means *lambda calculus with quantum circuits*.
 
 This is a term project of the course *Compiler Principles* of Peking University.
 
+[slides](./LambdaQ-slides.pdf)
+
 ## Language Specification
 
-`specification/specification.pdf`
+[`specification/specification.pdf`](specification/specification.pdf)
 
 ## Frontend
 
-`src/Frontend`
+[`src/Frontend`](src/Frontend/)
 
 ### Files
 Syntax Definition:
@@ -37,6 +39,6 @@ Printer:
 
 ## Backend
 
-`src/Backend`
+[`src/Backend`](src/Backend)
 
 ## Reference

@@ -29,3 +29,5 @@ fun teleport = / () : One .
   (a, b) <- capp bell00 to ();
   (x, y) <- capp alice to (q, a);
   capp bob to ((x, y), b);
+
+  
