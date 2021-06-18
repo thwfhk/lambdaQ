@@ -1,16 +1,17 @@
 # λQ
 
+(Work In Progress)
+
 **λQ**: A Simple Quantum Programming Language based on [QWIRE](https://github.com/inQWIRE/QWIRE) with a compiler to [QASM](https://github.com/Qiskit/openqasm).
 
 The name λQ means *lambda calculus with quantum circuits*.
 
 This is a term project of the course *Compiler Principles* of Peking University.
 
-[slides](./LambdaQ-slides.pdf)
 
-## Language Specification
-
-[`specification/specification.pdf`](specification/specification.pdf)
+## Report
+- [slides](./LambdaQ-slides.pdf)
+- [`report/report.pdf`](report/report.pdf)
 
 ## Frontend
 
