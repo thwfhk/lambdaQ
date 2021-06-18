@@ -32,15 +32,15 @@ repl = do
   case runMyParserREPL prog of
     Left err -> print err
     Right term -> do
-      putStrLn $ "[Parse SUCCESS 🥳]:\n  " ++ show term
+      putStrLn $ "[PARSE SUCCESS 🥳]:\n  " ++ show term
       let mty = runQwQ emptyctxs $ typeOf term
       case mty of
-        Right ty -> putStrLn $ "[Type SUCCESS 🥳]:\n  " ++ show ty
-        Left e -> putStrLn $ "[Type FAILED 😵]: " ++ e
+        Right ty -> putStrLn $ "[TYPE SUCCESS 🥳]:\n  " ++ show ty
+        Left e -> putStrLn $ "[TYPE FAILED 😵]: " ++ e
       let mqasm = runQwQ emptystate $ term2QASM term
       case mqasm of
-        Right (qasm, _) -> putStrLn $ "[Generation SUCCESS 🥳]:\n  " ++ show qasm ++ "\n" ++ printQASM qasm
-        Left e -> putStrLn $ "[Generation FAILED 😵]: " ++ e
+        Right (qasm, _) -> putStrLn $ "[GENARATION SUCCESS 🥳]:\n  " ++ show qasm ++ "\n" ++ printQASM "" qasm
+        Left e -> putStrLn $ "[GENERATION FAILED 😵]: " ++ e
   putStrLn ""
   repl
 
@@ -52,21 +52,21 @@ main = do
       sourceFile <- readFile sourceFileName
       -- print $ "Source: " ++ sourceFile
       case (runMyParser sourceFileName emptyctxs sourceFile) of
-        Left err -> putStrLn $ "[Parse FAILED 😵]: " ++ show err
+        Left err -> putStrLn $ "[PARSE FAILED 😵]: " ++ show err
         Right cmds -> do
-          putStrLn $ "[Parse SUCCESS 🥳]: " ++ show (length cmds)
+          putStrLn $ "[PARSE SUCCESS 🥳]: " ++ show (length cmds)
             ++ " function" ++ if length cmds == 1 then "" else "s" ++ " founded."
           let cmds' = deSugar cmds
           case (typeInference cmds') of
-            Left err -> putStrLn $ "[Type FAILED 😵]: " ++ err
+            Left err -> putStrLn $ "[TYPE FAILED 😵]: " ++ err
             Right tycms -> do
-              putStrLn $ "[Type SUCCESS 🥳]:"
+              putStrLn $ "[TYPE SUCCESS 🥳]:"
               let tys = map fst tycms
               let cmds'' = map snd tycms
               mapM_ (\ ((Def s _), ty) -> putStrLn $ "  " ++ s ++ " : " ++ printType ty) (zip cmds'' tys)
               case (codeGeneration cmds'') of
-                Left err -> putStrLn $ "[Generation FAILED 😵]: " ++ err
-                Right qasm -> putStrLn $ "[Generation SUCCESS 🥳]:\n" ++ printQASM qasm
+                Left err -> putStrLn $ "[GENERATION FAILED 😵]: " ++ err
+                Right qasm -> putStrLn $ "[GENERATION SUCCESS 🥳]:\n" ++ printQASM "  " qasm
     _ -> putStrLn "source-file name not founded, enter REPL" >> repl
 
 deSugar :: [Command] -> [Command]
