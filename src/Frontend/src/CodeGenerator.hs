@@ -191,10 +191,13 @@ genMeasure (PtName r) (PtName s) =
     r' <- pickNewReg
     return ([SmQop (Measure r r')], PtName r')
   else return ([], PtName r)
--- genMeasure (PtProd p1 p2) = do
---   (prog1, np1) <- genMeasure p1
---   (prog2, np2) <- genMeasure p2
---   return (prog1 ++ prog2, PtProd np1 np2)
+-- genMeasure x y = do
+--   traceM $ show (x, y)
+--   throwError $ "genMeasure mismatch"
+genMeasure (PtProd r1 r2) (PtProd s1 s2) = do
+  (prog1, np1) <- genMeasure r1 s1
+  (prog2, np2) <- genMeasure r2 s2
+  return (prog1 ++ prog2, PtProd np1 np2)
 
 tmCir2QASM :: Term -> Pattern -> ExceptT Err (State StateCG) (Program, Pattern)
 tmCir2QASM t p' = case t of
