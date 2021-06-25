@@ -4,6 +4,8 @@
 extern "C"{
 void yyerror(struct Node** root, const char *s);
 extern int yylex(void);
+extern char* yytext;
+extern int yylineno;
 #define YYDEBUG 1
 // 这里yylex是在lex.yy.c中定义的
 }
@@ -16,8 +18,9 @@ extern int yylex(void);
 
 %token QREG CREG BARRIER GATE MEASURE RESET INCLUDE OPAQUE IF SIN COS TAN EXP LN SQRT PI
 %token SEMICOLON COMMA LSPAREN RSPAREN LCPAREN RCPAREN EQUAL ARROW PLUS MINUS TIMES DIVIDE POWER LPAREN RPAREN REAL NNINTEGER ID  
-%token OPENQASM U CX
+%token OPENQASM U CX H X Y Z
 %token UMINUS
+
 
 
 %left PLUS MINUS
@@ -245,6 +248,22 @@ uop:
 	{
 		$$ = createNode(UOP_U, 2, $3, $5);
 	}
+	| H argument SEMICOLON
+	{
+		$$ = createNode(UOP_H, 1, $2);
+	}
+	| X argument SEMICOLON
+	{
+		$$ = createNode(UOP_X, 1, $2);
+	}
+	| Y argument SEMICOLON
+	{
+		$$ = createNode(UOP_Y, 1, $2);
+	}
+	| Z argument SEMICOLON
+	{
+		$$ = createNode(UOP_Z, 1, $2);
+	}
 	| CX argument COMMA argument SEMICOLON
 	{
 		$$ = createNode(UOP_CX, 2, $2, $4);
@@ -314,7 +333,7 @@ gatedecl:
 
 void yyerror(struct Node **, const char *s)	//当yacc遇到语法错误时，会回调yyerror函数，并且把错误信息放在参数s中
 {
-	cerr<<s<<endl;//直接输出错误信息
+ 	printf("%d:  %s  at  '%s'  \n",yylineno,s,yytext);
 }
 
  
@@ -335,14 +354,19 @@ int main()//程序主函数，这个函数也可以放到其它.c, .cpp文件里
 	printf("-----begin parsing %s\n", sFile);
 	struct Node* root;
     yyparse(&root);//使yacc开始读取输入和解析，它会调用lex的yylex()读取记号
-	puts("-----end parsing");
+	printf("-----end parsing\n");
     //treePrint(root);
 
 	printf("qcnt : %d\n", qcnt);
 	//printf("no cout: %d\n", qmap[string("cout")]);
 
 
-	qubit_allocation(Phi);
+	if (qubit_allocation(Phi)){
+		printf("allocation success!\n");
+	}
+	else{
+		printf("allocation fail\n");
+	}
 
     generate(root);
 	fclose(fp);

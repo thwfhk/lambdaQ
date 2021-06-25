@@ -128,6 +128,7 @@ void swap_qubit(int phy_u, int phy_v){
     int u = l_cur_inv[phy_u], v = l_cur_inv[phy_v];
     printf("// swap %d %d\n", u, v);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
     if(!freeze[u] && !freeze[v]){
+        //如果没有冻结的活可以直接更改l
         swap(l[u], l[v]);
         swap(l_inv[phy_u], l_inv[phy_v]);
         swap(l_cur_inv[phy_u], l_cur_inv[phy_v]);
@@ -138,20 +139,20 @@ void swap_qubit(int phy_u, int phy_v){
         swap(l_cur[u], l_cur[v]);
         if(hcnt[phy_u][phy_v]){
             if(hcnt[phy_v][phy_u]){
-                printf("cx q[%d], q[%d];\n", phy_u, phy_v);
-                printf("cx q[%d], q[%d];\n", phy_v, phy_u);
-                printf("cx q[%d], q[%d];\n", phy_u, phy_v);
+                printf("CX q[%d], q[%d];\n", phy_u, phy_v);
+                printf("CX q[%d], q[%d];\n", phy_v, phy_u);
+                printf("CX q[%d], q[%d];\n", phy_u, phy_v);
             }
             else
                 swap(phy_u, phy_v);
         }
-        printf("cx q[%d], q[%d];\n", phy_v, phy_u);
-        printf("h q[%d];\n", phy_v);
-        printf("h q[%d];\n", phy_u);
-        printf("cx q[%d], q[%d];\n", phy_v, phy_u);
-        printf("h q[%d];\n", phy_v);
-        printf("h q[%d];\n", phy_u);
-        printf("cx q[%d], q[%d];\n", phy_v, phy_u);
+        printf("CX q[%d], q[%d];\n", phy_v, phy_u);
+        printf("H q[%d];\n", phy_v);
+        printf("H q[%d];\n", phy_u);
+        printf("CX q[%d], q[%d];\n", phy_v, phy_u);
+        printf("H q[%d];\n", phy_v);
+        printf("H q[%d];\n", phy_u);
+        printf("CX q[%d], q[%d];\n", phy_v, phy_u);
         freeze[u] = 1;
         freeze[v] = 1;
     }
@@ -165,7 +166,7 @@ int transform(int u, int v){
     if(hcnt[phy_u][phy_v]) {
         freeze[u] = 1;
         freeze[v] = 1;
-        printf("cx q[%d], q[%d];\n",phy_u, phy_v);
+        printf("CX q[%d], q[%d];\n",phy_u, phy_v);
         return 1; //约束满足
     }
     if(gcnt[u][v] > 1){
@@ -175,28 +176,29 @@ int transform(int u, int v){
             exit(1);
         }
         swap_qubit(phy_v, t); //注意需要freeze所有经过的节点，会改变l and l_cur, freeze
-        transform(u, v);
+        return transform(u, v);
     }
     else if(hcnt[phy_v][phy_u]){
         printf("// inverse cnot %d %d\n", phy_u, phy_v);
-        printf("h q[%d];\n", phy_v);
-        printf("h q[%d];\n", phy_u);
-        printf("cx q[%d], q[%d];\n", phy_v, phy_u);
-        printf("h q[%d];\n", phy_v);
-        printf("h q[%d];\n", phy_u);
+        printf("H q[%d];\n", phy_v);
+        printf("H q[%d];\n", phy_u);
+        printf("CX q[%d], q[%d];\n", phy_v, phy_u);
+        printf("H q[%d];\n", phy_v);
+        printf("H q[%d];\n", phy_u);
+        return 1;
     }
     else {
         int flag = 0;
         for(int i = 0;i < nphy;i++){ 
             if(hcnt[phy_u][i] && hcnt[i][phy_v]){
                 printf("// bridge %d %d %d\n", phy_u, i, phy_v);
-                printf("cx q[%d], q[%d];\n", i, phy_v);
-                printf("cx q[%d], q[%d];\n", phy_u, i);
-                printf("cx q[%d], q[%d];\n", i, phy_v);
-                printf("cx q[%d], q[%d];\n", phy_u, i);
+                printf("CX q[%d], q[%d];\n", i, phy_v);
+                printf("CX q[%d], q[%d];\n", phy_u, i);
+                printf("CX q[%d], q[%d];\n", i, phy_v);
+                printf("CX q[%d], q[%d];\n", phy_u, i);
                 flag = 1;
                 freeze[l_cur_inv[i]] = 1;
-                break;
+                return 1;
             }
         }
         if(!flag){
@@ -206,10 +208,10 @@ int transform(int u, int v){
                 exit(1);
             }
             swap_qubit(phy_v, t); //注意需要freeze所有经过的节点，会改变l and l_cur, freeze
-            transform(u, v);
+            return transform(u, v);
         }
     }
-
+    return 0;
 
     freeze[u] = 1;
     freeze[v] = 1;
@@ -278,4 +280,5 @@ bool qubit_allocation(vector<Constraint> &Phi){
         printf("logic qubit %d is mapped to physical qubit %d\n", i, l[i]);
     }
     */
+   return 1;
 }

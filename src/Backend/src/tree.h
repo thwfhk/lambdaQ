@@ -77,5 +77,9 @@ enum yyNTtype
     GATEDECL = 422,
     STATEMENT_GATEDECL = 423,
     STATEMENT_GATE_GOPLIST = 424,
+    UOP_X = 425,
+    UOP_Y = 426,
+    UOP_Z = 427,
+    UOP_H = 428,
 
 };

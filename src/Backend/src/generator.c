@@ -33,6 +33,22 @@ extern int freeze[MAXN]; // 为0 说明已经出现过，不能改变initial map
 
 int transform(int u, int v);
 
+void generate_qreg(struct Node * node){
+    int offset, base;
+    if(node->tag == ID){
+        offset = 0;
+        base = qmap[node->value];
+    }
+    else {
+        offset = atoi(node->cld[1]->value);
+        base = atoi(node->cld[0]->value);
+    }
+    int phy_u = l_cur[base + offset];
+    printf("q[%d]", phy_u);
+    return;
+}
+// 只需要对qreg 单独处理，creg 不需要，因为不涉及变换
+
 void generate(struct Node * tree){
     switch(tree->tag)
     {
@@ -47,6 +63,7 @@ void generate(struct Node * tree){
             printf("OPENQASM ");
             generate(tree->cld[0]);
             printf(";\n");
+            //这里直接声明了所有qreg
             printf("qreg q[%d];\n", qcnt);
             generate(tree->cld[1]);
             break;
@@ -165,10 +182,34 @@ void generate(struct Node * tree){
             break;
         }
         case UOP_U:{
-            printf("u(");
+            printf("U(");
             generate(tree->cld[0]);
             printf(") ");
-            generate(tree->cld[1]);
+            generate_qreg(tree->cld[1]);
+            printf(";\n");
+            break;
+        }
+        case UOP_X:{
+            printf("X ");
+            generate_qreg(tree->cld[0]);
+            printf(";\n");
+            break;
+        }
+        case UOP_H:{
+            printf("H ");
+            generate_qreg(tree->cld[0]);
+            printf(";\n");
+            break;
+        }
+        case UOP_Y:{
+            printf("Y ");
+            generate_qreg(tree->cld[0]);
+            printf(";\n");
+            break;
+        }
+        case UOP_Z:{
+            printf("Z ");
+            generate_qreg(tree->cld[0]);
             printf(";\n");
             break;
         }
@@ -197,7 +238,7 @@ void generate(struct Node * tree){
         }
         case MEASURE:{
             printf("measure ");
-            generate(tree->cld[0]);
+            generate_qreg(tree->cld[0]);
             printf("->");
             generate(tree->cld[1]);
             printf(";\n");
@@ -205,7 +246,7 @@ void generate(struct Node * tree){
         }
         case RESET:{
             printf("reset ");
-            generate(tree->cld[0]);
+            generate_qreg(tree->cld[0]);
             printf(";\n");
             break;
         }
@@ -245,6 +286,7 @@ void generate(struct Node * tree){
             break;
         }
         case IF:{
+            //都是creg 不需要特殊处理
             printf("if(");
             generate(tree->cld[0]);
             printf(" == ");

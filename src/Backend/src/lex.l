@@ -142,12 +142,28 @@
     return OPENQASM;
 }
 
-"u" {
+"U" {
     yylval = createLeaf(U, yytext);
     return U;
 }
 
-"cx" {
+"H" {
+    yylval = createLeaf(H, yytext);
+    return H;
+}
+"X" {
+    yylval = createLeaf(X, yytext);
+    return X;
+}
+"Y" {
+    yylval = createLeaf(Y, yytext);
+    return Y;
+}
+"Z" {
+    yylval = createLeaf(Z, yytext);
+    return Z;
+}
+"CX" {
     yylval = createLeaf(CX, yytext);
     return CX;
 }

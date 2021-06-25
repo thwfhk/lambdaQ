@@ -74,12 +74,20 @@ void treePrint(struct Node *nd)
 }
 
 int get_qid(struct Node * x){
-	string id = x->cld[0]->value;
-	int n = atoi(x->cld[1]->value);
-	return qmap[id] + n;
+	if(x->tag == ID)
+		return qmap[x->value];
+	else{
+		string id = x->cld[0]->value;
+		int n = atoi(x->cld[1]->value);
+		return qmap[id] + n;
+	}
 }
 int get_cid(struct Node * x){
-	string id = x->cld[0]->value;
-	int n = atoi(x->cld[1]->value);
-	return cmap[id] + n;
+	if(x->tag == ID)
+		return cmap[x->value];
+	else{
+		string id = x->cld[0]->value;
+		int n = atoi(x->cld[1]->value);
+		return cmap[id] + n;
+	}
 }
