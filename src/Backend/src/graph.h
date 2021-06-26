@@ -27,10 +27,12 @@ class node{
     node (int tag): tag (tag){
         in = NULL;
         out = NULL;
+        arg_int[0] = arg_int[1] = -1;
     };
     node(){
         in = NULL;
         out = NULL;
+        arg_int[0] = arg_int[1] = -1;
     };
     void print(){
         if(tag == OPENQASM){
@@ -53,6 +55,22 @@ class node{
         }
         else if(tag == H){
             printf("H q[%d];\n", arg_int[0]);
+        }
+        else if(tag == X){
+            printf("X q[%d];\n", arg_int[0]);
+        }
+        else if(tag == Y){
+            printf("Y q[%d];\n", arg_int[0]);
+        }
+        else if(tag == Z){
+            printf("Z q[%d];\n", arg_int[0]);
+        }
+        else if (tag == RESET){
+            printf("reset q[%d];\n", arg_int[0]);
+        }
+        else if(tag == IF){
+            printf("if(%s==%d) ", arg_char, arg_int[0]);
+            cld->print();
         }
 
     }
@@ -134,8 +152,29 @@ struct Graph{
                 int to = v->v;
                 printf("%d ", to);
             }
-            printf("\n");
+            printf("\n\n");
         }
+    }
+    // next node of node u in qreg i (-1 if not found)
+    int next_node(int t, int i){
+        struct node u = vertex[t];
+        for(edge* v = u.out;v;v = v->next_edge){
+            int to = v->v;
+            if(vertex[to].arg_int[0] == i || vertex[to].arg_int[1] == i){
+                return to;
+            }
+        }
+        return -1;
+    }
+    int prev_node(int t, int i){
+        struct node u = vertex[t];
+        for(edge* v = u.in;v;v = v->next_edge){
+            int to = v->v;
+            if(vertex[to].arg_int[0] == i || vertex[to].arg_int[1] == i){
+                return to;
+            }
+        }
+        return -1;
     }
 };
 #endif

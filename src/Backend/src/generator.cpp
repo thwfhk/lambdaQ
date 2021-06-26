@@ -69,8 +69,14 @@ void generate(struct Node * tree, Graph * g){
             printf(";\n");
             int t = g->addVertex(OPENQASM);
             g->vertex[t].arg_char = tree->cld[0]->value;//版本号
-            //这里直接声明了所有qreg
+            int qmax = 0;
+            //这里直接声明了所有qreg，大小是被映射的物理bit的最大坐标（因为不同bit 不一样，所以可能不对称）
+            for(int i = 0;i < qcnt;i++)
+                qmax = max(qmax, l[i]);
+            qcnt = qmax + 1;
+
             printf("qreg q[%d];\n", qcnt);
+
             t = g->addVertex(QREG);
             g->vertex[t].arg_int[0] = qcnt;
             for(int i = 0;i < qcnt;i++){
@@ -234,7 +240,6 @@ void generate(struct Node * tree, Graph * g){
             printf(") ");
             int u = generate_qreg(tree->cld[1]);
             printf(";\n");
-            printf("rz string %s\n", tree->cld[0]->value);
             string* s = new string;
             *s = generate_exp(tree->cld[0]);
             g->addRZVertex(u, (char*)s->c_str());
@@ -242,26 +247,30 @@ void generate(struct Node * tree, Graph * g){
         }
         case UOP_X:{
             printf("X ");
-            generate_qreg(tree->cld[0]);
+            int u = generate_qreg(tree->cld[0]);
             printf(";\n");
+            g->addSingleQubitVertex(X, u);
             break;
         }
         case UOP_H:{
             printf("H ");
-            generate_qreg(tree->cld[0]);
+            int u = generate_qreg(tree->cld[0]);
             printf(";\n");
+            g->addSingleQubitVertex(H, u);
             break;
         }
         case UOP_Y:{
             printf("Y ");
-            generate_qreg(tree->cld[0]);
+            int u = generate_qreg(tree->cld[0]);
             printf(";\n");
+            g->addSingleQubitVertex(Y, u);
             break;
         }
         case UOP_Z:{
             printf("Z ");
-            generate_qreg(tree->cld[0]);
+            int u = generate_qreg(tree->cld[0]);
             printf(";\n");
+            g->addSingleQubitVertex(Z, u);
             break;
         }
         case UOP_CX:{

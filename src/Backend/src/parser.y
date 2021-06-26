@@ -377,7 +377,16 @@ int main()//程序主函数，这个函数也可以放到其它.c, .cpp文件里
 	Graph g;
     generate(root, &g);
 	g.toposort();
-	// g.printedge();
+	//g.printedge();
+	printf("********\n");
+	for(int i = 0;i < qcnt;i++){
+		int t = 1;
+		printf("qreg %d\n", i);
+		while(t >= 0){
+			g.vertex[t].print();
+			t = g.next_node(t, i);
+		}
+	}
 	fclose(fp);
  
 	return 0;
