@@ -81,5 +81,6 @@ enum yyNTtype
     UOP_Y = 426,
     UOP_Z = 427,
     UOP_H = 428,
+    UOP_RZ = 429,
 
 };

@@ -5,5 +5,8 @@ qreg a[5];
 CX a[0], a[1];
 CX a[1], a[2];
 CX a[2], a[3];
+RZ(pi*4+3) a[2];
+
 CX a[3], a[4];
 CX a[0], a[4];
+RZ(pi*4+3) a[1];

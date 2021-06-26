@@ -167,6 +167,10 @@
     yylval = createLeaf(CX, yytext);
     return CX;
 }
+"RZ" {
+    yylval = createLeaf(RZ, yytext);
+    return RZ;
+}
 
 ([0-9]+\.[0-9]*|[0-9]\.[0-9]+)([eE][-+]?[0-9]+)? {
     yylval = createLeaf(REAL, yytext);

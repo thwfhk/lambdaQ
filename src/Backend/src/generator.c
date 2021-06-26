@@ -189,6 +189,14 @@ void generate(struct Node * tree){
             printf(";\n");
             break;
         }
+        case UOP_RZ:{
+            printf("RZ(");
+            generate(tree->cld[0]);
+            printf(") ");
+            generate_qreg(tree->cld[1]);
+            printf(";\n");
+            break;
+        }
         case UOP_X:{
             printf("X ");
             generate_qreg(tree->cld[0]);
