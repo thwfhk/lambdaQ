@@ -1,5 +1,6 @@
 #include "parser.tab.h"
 #include "tree.h"
+#include "graph.h"
 
 
 
@@ -124,7 +125,7 @@ void swap(int & x, int & y){
 }
 
 // 输入是物理 qubit 
-void swap_qubit(int phy_u, int phy_v){
+void swap_qubit(int phy_u, int phy_v, Graph * g){
     int u = l_cur_inv[phy_u], v = l_cur_inv[phy_v];
     printf("// swap %d %d\n", u, v);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
     if(!freeze[u] && !freeze[v]){
@@ -140,19 +141,29 @@ void swap_qubit(int phy_u, int phy_v){
         if(hcnt[phy_u][phy_v]){
             if(hcnt[phy_v][phy_u]){
                 printf("CX q[%d], q[%d];\n", phy_u, phy_v);
+                g->addCXVertex(phy_u, phy_v);
                 printf("CX q[%d], q[%d];\n", phy_v, phy_u);
+                g->addCXVertex(phy_v, phy_u);
                 printf("CX q[%d], q[%d];\n", phy_u, phy_v);
+                g->addCXVertex(phy_u, phy_v);
             }
             else
                 swap(phy_u, phy_v);
         }
         printf("CX q[%d], q[%d];\n", phy_v, phy_u);
+        g->addCXVertex(phy_v, phy_u);
         printf("H q[%d];\n", phy_v);
+        g->addSingleQubitVertex(H, phy_v);
         printf("H q[%d];\n", phy_u);
+        g->addSingleQubitVertex(H, phy_u);
         printf("CX q[%d], q[%d];\n", phy_v, phy_u);
+        g->addCXVertex(phy_v, phy_u);
         printf("H q[%d];\n", phy_v);
+        g->addSingleQubitVertex(H, phy_v);
         printf("H q[%d];\n", phy_u);
+        g->addSingleQubitVertex(H, phy_u);
         printf("CX q[%d], q[%d];\n", phy_v, phy_u);
+        g->addCXVertex(phy_v, phy_u);
         freeze[u] = 1;
         freeze[v] = 1;
     }
@@ -160,13 +171,15 @@ void swap_qubit(int phy_u, int phy_v){
 }
 
 
-int transform(int u, int v){
+int transform(int u, int v, Graph* g){
 // 更改ast中的argument 一定要在这里
     int phy_u = l_cur[u], phy_v = l_cur[v];
     if(hcnt[phy_u][phy_v]) {
         freeze[u] = 1;
         freeze[v] = 1;
         printf("CX q[%d], q[%d];\n",phy_u, phy_v);
+        g->addCXVertex(phy_u, phy_v);
+
         return 1; //约束满足
     }
     if(gcnt[u][v] > 1){
@@ -175,16 +188,21 @@ int transform(int u, int v){
             fprintf(stderr, "This initial mapping is invalid\n");
             exit(1);
         }
-        swap_qubit(phy_v, t); //注意需要freeze所有经过的节点，会改变l and l_cur, freeze
-        return transform(u, v);
+        swap_qubit(phy_v, t, g); //注意需要freeze所有经过的节点，会改变l and l_cur, freeze
+        return transform(u, v, g);
     }
     else if(hcnt[phy_v][phy_u]){
         printf("// inverse cnot %d %d\n", phy_u, phy_v);
         printf("H q[%d];\n", phy_v);
+        g->addSingleQubitVertex(H, phy_v);
         printf("H q[%d];\n", phy_u);
+        g->addSingleQubitVertex(H, phy_u);
         printf("CX q[%d], q[%d];\n", phy_v, phy_u);
+        g->addCXVertex(phy_u, phy_v);
         printf("H q[%d];\n", phy_v);
+        g->addSingleQubitVertex(H, phy_v);
         printf("H q[%d];\n", phy_u);
+        g->addSingleQubitVertex(H, phy_u);
         return 1;
     }
     else {
@@ -193,9 +211,13 @@ int transform(int u, int v){
             if(hcnt[phy_u][i] && hcnt[i][phy_v]){
                 printf("// bridge %d %d %d\n", phy_u, i, phy_v);
                 printf("CX q[%d], q[%d];\n", i, phy_v);
+                g->addCXVertex(i, phy_v);
                 printf("CX q[%d], q[%d];\n", phy_u, i);
+                g->addCXVertex(phy_u, i);
                 printf("CX q[%d], q[%d];\n", i, phy_v);
+                g->addCXVertex(i, phy_v);
                 printf("CX q[%d], q[%d];\n", phy_u, i);
+                g->addCXVertex(phy_u, i);
                 flag = 1;
                 freeze[l_cur_inv[i]] = 1;
                 return 1;
@@ -207,8 +229,8 @@ int transform(int u, int v){
                 fprintf(stderr, "This initial mapping is invalid\n");
                 exit(1);
             }
-            swap_qubit(phy_v, t); //注意需要freeze所有经过的节点，会改变l and l_cur, freeze
-            return transform(u, v);
+            swap_qubit(phy_v, t, g); //注意需要freeze所有经过的节点，会改变l and l_cur, freeze
+            return transform(u, v, g);
         }
     }
     return 0;
@@ -274,7 +296,7 @@ bool qubit_allocation(vector<Constraint> &Phi){
     for(int i = 0;i < n_con;i++){
         int u = Phi[i].u, v  = Phi[i].v;
         printf("tranforming %d %d...\n", u, v);
-        transform(u, v);
+        transform(u, v, g);
     }
     for(int i = 0;i < qcnt;i++){
         printf("logic qubit %d is mapped to physical qubit %d\n", i, l[i]);
@@ -282,3 +304,4 @@ bool qubit_allocation(vector<Constraint> &Phi){
     */
    return 1;
 }
+

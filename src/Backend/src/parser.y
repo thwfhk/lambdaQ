@@ -1,5 +1,6 @@
 %{
 #include "tree.h"
+#include "graph.h"
 
 extern "C"{
 void yyerror(struct Node** root, const char *s);
@@ -266,6 +267,7 @@ uop:
 	}
 	| RZ LPAREN exp RPAREN argument SEMICOLON
 	{
+		printf("matching exp: %s\n", yytext);
 		$$ = createNode(UOP_RZ, 2, $3, $5);
 	}
 	| CX argument COMMA argument SEMICOLON
@@ -372,7 +374,10 @@ int main()//程序主函数，这个函数也可以放到其它.c, .cpp文件里
 		printf("allocation fail\n");
 	}
 
-    generate(root);
+	Graph g;
+    generate(root, &g);
+	g.toposort();
+	// g.printedge();
 	fclose(fp);
  
 	return 0;
