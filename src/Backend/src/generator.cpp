@@ -307,9 +307,9 @@ void generate(struct Node * tree, Graph * g){
             g->vertex[t].arg_int[0] = u;
             g->vertex[t].arg_int[1] = atoi(tree->cld[1]->cld[1]->value);
             g->vertex[t].arg_char = tree->cld[1]->cld[0]->value;
-            g->addEdge(q_last[u], t);
+            g->addEdge(q_last[u], t, u);
             int cid = get_cid(tree->cld[1]);// creg 的编号
-            g->addEdge(c_last[cid], t);
+            g->addEdge(c_last[cid], t, -cid);
             q_last[u] = c_last[cid] = t;
             break;
         }
