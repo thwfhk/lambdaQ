@@ -379,10 +379,11 @@ int main()//程序主函数，这个函数也可以放到其它.c, .cpp文件里
     generate(root, &g);
 	g.toposort();
 	g.printedge();
-	H_reduction(&g);
+	//H_reduction(&g);
+	singleQubitCancellation(&g);
 	printf("after reduction********\n");
 	g.toposort();
-	//g.printedge();
+	g.printedge();
 	fclose(fp);
 	return 0;
 }

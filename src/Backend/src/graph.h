@@ -53,6 +53,10 @@ class node{
         if(tag == x.tag){
             if(tag == RZ){
                 //printf("%s, %s, %d\n", arg_char, x.arg_char, strcmp(arg_char, arg_char));
+                //如果有任何一个是any 的话直接返回相等
+                if(!strcmp(x.arg_char, "any") || !strcmp(arg_char, "any")){
+                    return true;
+                }
                 return !strcmp(arg_char, x.arg_char);
             }
             else 

@@ -127,6 +127,7 @@ void swap(int & x, int & y){
 // 输入是物理 qubit 
 void swap_qubit(int phy_u, int phy_v, Graph * g){
     int u = l_cur_inv[phy_u], v = l_cur_inv[phy_v];
+    if(u == v) return ;//这个是新加的，不知道为什么有时候会调用相同的
     printf("// swap %d %d\n", u, v);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
     if(!freeze[u] && !freeze[v]){
         //如果没有冻结的活可以直接更改l
