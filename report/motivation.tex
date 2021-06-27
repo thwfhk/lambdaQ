@@ -6,7 +6,6 @@ blah\\
 blah\\
 blah\\
 blah\\
-blah\\
 
 There are three main models of quantum computing: \textit{Quantum Turing Machine}, \textit{Quantum $\lambda$-Calculus} and \textit{Quantum Circuit}, among which the third one is the most practical.
 Most quantum programming languages are \textit{quantum-circuit description languages}, which means they are used to describe the architecture of quantum circuits.
@@ -46,3 +45,18 @@ The output QASM program can run on the IBM cloud quantum machine.
 The main feature of $\lambda_Q$ is that the syntax for traditional computation and quantum computation are separated.
 They communicate with each other via some specific operations : quantum circuit can be \textit{abstracted} or \textit{lifted (measured)} into traditional term, and traditional term for quantum circuit can be applied to quantum bits.
 Thus, the syntax of quantum circuit can use \textit{linear type system} to guarantee that the Quantum Non-cloning Theorem is not violated, meanwhile the $\lambda$-calculus of the traditional part makes it easier to write quantum programs.
+We will explain it in detail in Section \ref{spec}.
+
+The overall structure of the compiler can be visualized in Figure \ref{compiler}.
+The frontend is implemented using \texttt{Haskell}, and the backend is implemented using \texttt{C}.
+We will discuss the implementation of $\lambda_Q$ compiler in detail in Section \ref{front} and \ref{back}.
+
+
+\begin{center}
+  \begin{figure}
+    \label{compiler}
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/overview.png}
+    \caption{Structure of $\lambda_Q$ compiler.}
+  \end{figure}
+\end{center}

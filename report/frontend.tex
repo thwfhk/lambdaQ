@@ -1,10 +1,35 @@
-\section{Frontend}
+\section{Frontend}\label{front}
 In this section we illustrate the design and implementation of the frontend of compiler of $\lambda_Q$.
+The frontend consists of about 1300 lines of Haskell.
+\footnote{The code of functional programming languages are usually much more dense than imperative ones.}
 
 \subsection{Lexer \& Parser}
+We use the \texttt{Parsec} package of Haskell to implement the lexer and parser.
+It is a parser-combinator library which is used to write a parser in a top-down style.
+This part together with the syntax definition consists of about 500 lines of Haskell code.
+There is nothing much special in this part. Interested readers can refer to our code.
 
 \subsection{Desugar}
+The process of desugaring is simply a top-down recursion on the abstract syntax tree.
 
 \subsection{Type Inference}
+The implementation of the type checker (or ``inferencer'') is the most tricky part of the frontend.
+Although it is only about 350 lines together with context management, there are a lot of details to deal with.
+The goal of type inference is to infer the type of a term based on the typing rules, meanwhile checking that the term doesn't violate these rules.
+The type inference for linear type also requires to check every context for linear variables are \textit{well-formed}, which is defined in Section \ref{typing}.
 
-\subsection{}
+The type inference for $\lambda$-calculus is standard.
+The novel part is that we develop an algorithm to check the linear type system used by $\lambda_Q$.
+In particular, we specify the order in which each component is checker for each syntax of quantum circuits to inference the wire type of quantum circuits meanwhile ensuring the context for linear (quantum) variables is well-formed.
+What's more, we use the mechanism of \textit{monad transformers} to deal with the state and error information in the process of type inference.
+Readers can refer to our code for more details.
+
+\subsection{Intermediate Code Generation}
+There are two main problems for the code generation from $\lambda_Q$ to the extended QASM.
+The first is to maintain the register and variable bindings.
+We make use of the De Bruijn index maintain the traditional bit variables mapping.
+And we use a hash table and a counter to implement a register pool in a functional language, which is used to allocate new registers.
+The second is to deal with the restricted expressiveness of QASM.
+QASM only supports condition statements, so we restrict the term in $\capp\ t\ \mathtt{to}\ p$ to be the form of circuit abstraction or if statement whose branches are all circuit abstractions.
+This restriction can be loosed further, but we do not implement it yet because it is already enough to use.
+This part together with the syntax of extended QASM consists of about 300 lines.

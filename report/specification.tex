@@ -1,6 +1,6 @@
-\section{Specification of $\lambda_Q$}
+\section{Specification of $\lambda_Q$} \label{spec}
 
-In this section we give the language specification of $\lambda_Q$, including the syntax and typing rules.
+In this section we give the language specification of $\lambda_Q$, including the syntax, typing rules and syntactic sugars.
 The syntax and typing rules of the quantum circuit are similar to Qwire \cite{qwire}.
 The operational semantics are not given in this section.
 Instead, we give a transformation from $\lambda_Q$ to $QASM$ in the section of frontend, which gives semantics to each syntax of $\lambda_Q$.
@@ -107,7 +107,7 @@ The syntax of the quantum part (circuits, wire types, wire patterns, gates, gate
   
 \end{longtable}
 
-\subsection{Typing Rules}
+\subsection{Typing Rules} \label{typing}
 The main feature of the language design of $\lambda_Q$ is to use linear type system to guarantee no quantum bit is used twice or not used at all.
 To state the type inference rules of $\lambda_Q$, we first need to define what is a \textbf{well-formed wire context}, which is used to maintain variables used by quantum circuit in the calculus.
 This context is actually corresponding to the context of linear variables in the traditional linear type system.
@@ -195,3 +195,8 @@ The typing rules for circuit uses linear type. The context $\Gamma$ is for norma
 %   $\infer{\Gamma\vdash t.2:[x\mapsto t.1]T}{\Gamma\vdash t:\Sigma x:S.T}$ &(T-PROJ2)\\
 %   $\infer{\Gamma\vdash t:T'}{\Gamma\vdash t:T &\Gamma\vdash T\equiv T'::*}$ &(T-CONV)\\
 % \end{longtable}
+
+\subsection{Syntactic Sugar}
+In programming languages, it is useful to design some syntactic sugar to make it easier for programmer to programming.
+We introduce a syntactic sugar to $\lambda_Q$ to abstract one common form of gate application.
+$$p \from \gate\ g\ p;\toutput\ p \ =\ \gate'\ g\ p$$
