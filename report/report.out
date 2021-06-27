@@ -7,4 +7,8 @@
 \BOOKMARK [3][-]{subsubsection.2.2.3}{Typing\040rules\040for\040circuits}{subsection.2.2}% 7
 \BOOKMARK [3][-]{subsubsection.2.2.4}{Typing\040rules\040for\040terms}{subsection.2.2}% 8
 \BOOKMARK [1][-]{section.3}{Frontend}{}% 9
-\BOOKMARK [1][-]{section.4}{Backend}{}% 10
+\BOOKMARK [2][-]{subsection.3.1}{Lexer\040&\040Parser}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.2}{Desugar}{section.3}% 11
+\BOOKMARK [2][-]{subsection.3.3}{Type\040Inference}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.4}{}{section.3}% 13
+\BOOKMARK [1][-]{section.4}{Backend}{}% 14

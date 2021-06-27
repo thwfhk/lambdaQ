@@ -2,9 +2,13 @@
 \contentsline {section}{\numberline {2}Specification of $\lambda _Q$}{2}{section.2}% 
 \contentsline {subsection}{\numberline {2.1}Syntax}{2}{subsection.2.1}% 
 \contentsline {subsection}{\numberline {2.2}Typing Rules}{4}{subsection.2.2}% 
-\contentsline {subsubsection}{\numberline {2.2.1}Typing rules for gates}{4}{subsubsection.2.2.1}% 
-\contentsline {subsubsection}{\numberline {2.2.2}Typing rules for patterns}{4}{subsubsection.2.2.2}% 
+\contentsline {subsubsection}{\numberline {2.2.1}Typing rules for gates}{5}{subsubsection.2.2.1}% 
+\contentsline {subsubsection}{\numberline {2.2.2}Typing rules for patterns}{5}{subsubsection.2.2.2}% 
 \contentsline {subsubsection}{\numberline {2.2.3}Typing rules for circuits}{5}{subsubsection.2.2.3}% 
-\contentsline {subsubsection}{\numberline {2.2.4}Typing rules for terms}{5}{subsubsection.2.2.4}% 
-\contentsline {section}{\numberline {3}Frontend}{6}{section.3}% 
-\contentsline {section}{\numberline {4}Backend}{6}{section.4}% 
+\contentsline {subsubsection}{\numberline {2.2.4}Typing rules for terms}{6}{subsubsection.2.2.4}% 
+\contentsline {section}{\numberline {3}Frontend}{7}{section.3}% 
+\contentsline {subsection}{\numberline {3.1}Lexer \& Parser}{7}{subsection.3.1}% 
+\contentsline {subsection}{\numberline {3.2}Desugar}{7}{subsection.3.2}% 
+\contentsline {subsection}{\numberline {3.3}Type Inference}{7}{subsection.3.3}% 
+\contentsline {subsection}{\numberline {3.4}}{7}{subsection.3.4}% 
+\contentsline {section}{\numberline {4}Backend}{7}{section.4}% 
