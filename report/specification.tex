@@ -1,6 +1,15 @@
-\section{Specification of $\lambda_Q$}
+\section{Specification of $\lambda_Q$} \label{spec}
+
+In this section we give the language specification of $\lambda_Q$, including the syntax, typing rules and syntactic sugars.
+The syntax and typing rules of the quantum circuit are similar to Qwire \cite{qwire}.
+The operational semantics are not given in this section.
+Instead, we give a transformation from $\lambda_Q$ to $QASM$ in the section of frontend, which gives semantics to each syntax of $\lambda_Q$.
+Interested readers can refer to the operational semantics of simply-typed $\lambda$-calculus and Qwire.
 
 \subsection{Syntax}
+The syntax of the traditional part (terms, values, types) is an extended version of simply-typed $\lambda$-calcus with $\trun\ C$ and $\kappa \ p:W . C$, which are used to interact with the quantum part.
+The syntax of the quantum part (circuits, wire types, wire patterns, gates, gate types) is similar to the syntax of Qwire.
+% \mycomment{twh}{modify syntax (especially gate)}
 
 \begin{longtable}[c]{lclr}
   % \caption{syntax}
@@ -78,6 +87,10 @@
       & &$\init_1$ &generate a qubit 1 \\
       & &$\meas$ &measurement gate \\
       & &$\discard$ &disgard gate \\
+      & &$\Ha$ &Hadamard gate \\
+      & &$\X$ &Pauli-X gate \\
+      & &$\Z$ &Pauli-Z gate \\
+      & &$\CNOT$ &CNOT gate \\
   \\
 
   $G$ &$::=$ &  &\textbf{gate types}:\\
@@ -94,14 +107,16 @@
   
 \end{longtable}
 
-\subsection{Typing Rules}
-First, we need to define what is a \textbf{well-formed wire context}.
+\subsection{Typing Rules} \label{typing}
+The main feature of the language design of $\lambda_Q$ is to use linear type system to guarantee no quantum bit is used twice or not used at all.
+To state the type inference rules of $\lambda_Q$, we first need to define what is a \textbf{well-formed wire context}, which is used to maintain variables used by quantum circuit in the calculus.
+This context is actually corresponding to the context of linear variables in the traditional linear type system.
 \begin{Def}[Well-formed Wire Contexts]
   A wire context $\Omega$ is well-formed, if there are no duplicate wire variables in it.
   For simplicity, we always assume the wire contexts are well-formed in the following contexts. And when we write $\Omega_1, \Omega_2$, we require $\Omega_1$ and $\Omega_2$ to be disjoint to preserve the well-formedness.
 \end{Def}
 
-Since there are some different kinds of terms: ($\lambda$-)terms, wire patterns, gates and circuits, we have defined some different typing relations for each of them.
+Since there are some different kinds of terms: ($\lambda$-)terms, wire patterns, gates and circuits, we have defined several different typing relations for each of them.
 \begin{itemize}
   \item $\Omega \vdash p : W$ is the typing relation for patterns.
   \item $\Gamma ; \Omega \vdash C : W$ is the typing relation for circuits;
@@ -124,9 +139,10 @@ Note that since we only support built-in gates, the typing rules for gates are e
 \end{longtable}
 
 \subsubsection{Typing rules for patterns}
+The patterns are used to construct complex gates.
+Patterns are destructed when doing pattern matching in gate application, circuit composition and dynamic lifting.
 
 \noindent \textbf{Typing rules for patterns}: $\boxed{\Omega \vdash p : W}$
-
 \renewcommand\arraystretch{2.5}
 \begin{longtable}[c]{cr}
   $ \infer{\varnothing \vdash ():One}{}$ & \\
@@ -135,6 +151,7 @@ Note that since we only support built-in gates, the typing rules for gates are e
 \end{longtable}
 
 \subsubsection{Typing rules for circuits}
+The typing rules for circuit uses linear type. The context $\Gamma$ is for normal (traditional) variables and the context $\Omega$ is for linear (quantum) variables.
 
 \noindent \textbf{Typing rules for circuits}: $\boxed{\Gamma;\Omega\vdash C:W}$
 
@@ -150,6 +167,7 @@ Note that since we only support built-in gates, the typing rules for gates are e
 \end{longtable}
 
 \subsubsection{Typing rules for terms}
+
 \noindent \textbf{Typing rules for ($\lambda$-)terms}: $\boxed{\Gamma\vdash t:T}$
 
 \renewcommand\arraystretch{3}
@@ -177,3 +195,8 @@ Note that since we only support built-in gates, the typing rules for gates are e
 %   $\infer{\Gamma\vdash t.2:[x\mapsto t.1]T}{\Gamma\vdash t:\Sigma x:S.T}$ &(T-PROJ2)\\
 %   $\infer{\Gamma\vdash t:T'}{\Gamma\vdash t:T &\Gamma\vdash T\equiv T'::*}$ &(T-CONV)\\
 % \end{longtable}
+
+\subsection{Syntactic Sugar}
+In programming languages, it is useful to design some syntactic sugar to make it easier for programmer to programming.
+We introduce a syntactic sugar to $\lambda_Q$ to abstract one common form of gate application.
+$$p \from \gate\ g\ p;\toutput\ p \ =\ \gate'\ g\ p$$

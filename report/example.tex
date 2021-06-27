@@ -1,0 +1,81 @@
+\section{Usage and Examples}
+
+See the \texttt{readme} file of our repository for code structure and usage.
+Here we give some examples of $\lambda_Q$ program.
+Note that a $\lambda_Q$ program should contain at least one circuit abstraction (i.e. $\kappa$ abstraction) as its entry point, just like the main function in other programming languages.
+For simplicity, we assume the last circuit abstraction is the entry point.
+
+
+\subsection{Quantum Teleportation}
+
+This is a classical example also appeared in some other papers about quantum programming languages.
+It can be written in $\lambda_Q$ like follows.
+
+\begin{lstlisting}[language=Lambda]
+fun bell00 = / () : One .
+  a <- gate init0 ();
+  b <- gate init0 ();
+  a <- gate H a;
+  (a, b) <- gate CNOT (a, b);
+  output (a, b)
+
+fun alice = / (q, a) : Qubit # Qubit .
+  (q, a) <- gate CNOT (q, a);
+  q <- gate H q;
+  x <- gate meas q;
+  y <- gate meas a;
+  output (x,y)
+
+fun bob = / ((w1, w2), q) : Bit # Bit # Qubit .
+    (x1, x2) <-| lift (w1, w2);
+    q <- capp (if x2
+               then (/ t : Qubit . gate X t)
+               else (/ t : Qubit . output t)
+         ) to q;
+    capp (if x1
+          then (/ t : Qubit . gate Z t)
+          else (/ t : Qubit . output t)
+    ) to q
+
+fun teleport = / () : One .
+  q <- gate init0 ();
+  (a, b) <- capp bell00 to ();
+  (x, y) <- capp alice to (q, a);
+  capp bob to ((x, y), b);
+\end{lstlisting}
+
+\subsection{Simple Optimization}
+Here is another simple example to show the optimization power of our backend.
+The original $\lambda_Q$ program is:
+\begin{lstlisting}[language=lambda]
+fun qwq = / () : One .
+  a <- gate init0 ();
+  b <- gate init0 ();
+  a <- gate H a;
+  b <- gate H b;
+  (c, d) <- gate CNOT (a, b);
+  c <- gate H c;
+  d <- gate H d;
+  output (c, d)
+\end{lstlisting}
+
+The output of the frontend is:
+\begin{lstlisting}[language=lambda]
+openqasm 2.0;
+qreg r0[1];
+qreg r1[1];
+H r0;
+H r1;
+CX r0, r1;
+H r0;
+H r1;
+\end{lstlisting}
+
+And the output of the backend is:
+\begin{lstlisting}[language=lambda]
+openqasm 2.0;
+qreg q[2];
+CX q[1], q[0];
+\end{lstlisting}
+
+The optimization really works!

@@ -4,7 +4,7 @@
 \usepackage{amsmath,amsfonts,graphicx,amssymb,bm,amsthm}
 \usepackage{mathtools}
 \usepackage{mathrsfs}
-\usepackage{natbib}
+\usepackage[square, numbers]{natbib}
 \bibliographystyle{abbrv}
 \usepackage{lastpage}
 \usepackage{paralist}
@@ -45,6 +45,7 @@
 \usepackage{newclude}
 %Includes "References" in the table of contents
 \usepackage[nottoc]{tocbibind}
+
 % write inference rules
 \usepackage{proof}
 \usepackage{semantic}
@@ -67,32 +68,29 @@
 % \usepackage{newtxtext}
 % \usepackage{newtxmath}
 
-% \usepackage{listings}
-% \definecolor{light-gray}{gray}{0.85}
-% \lstdefinelanguage{lambda}{%
-%   morekeywords={%
-%     if,then,else,fix,fun % keywords go here
-%   },%
-%   morekeywords={[2]Nat,Bool,Vector},   % types go here
-%   otherkeywords={}, % operators go here
-%   literate={% replace strings with symbols
-%     {->}{{$\to$}}{2}
-%     {lambda}{{$\lambda$}}{1}
-%     {Pi}{{$\Pi$}}{1}
-%     {Sigma}{{$\Sigma$}}{1}
-%     {n1}{{$n_1$}}{1}
-%     {n2}{{$n_2$}}{1}
-%     {v1}{{$v_1$}}{1}
-%     {v2}{{$v_2$}}{1}
-%   },
-%   basicstyle={\lstfont}, 
-%   keywordstyle={\bfseries},
-%   keywordstyle={[2]\itshape}, % style for types
-%   keepspaces,
-%   mathescape, 
-%   columns=fixed,
-%   backgroundcolor = \color{light-gray}
-% }[keywords,comments,strings]
+\usepackage{listings}
+\definecolor{light-gray}{gray}{0.85}
+\lstdefinelanguage{lambda}{%
+  morekeywords={%
+    if,then,else,fix,fun % keywords go here
+  },%
+  morekeywords={[2]Nat,Bool,Vector},   % types go here
+  otherkeywords={}, % operators go here
+  literate={% replace strings with symbols
+    {<-}{{$\from$}}{2}
+    {<-|}{{$\hookleftarrow$}}{2}
+    {->}{{$\to$}}{2}
+    {lambda}{{$\lambda$}}{1}
+    {/}{{$\kappa$}}{1}
+  },
+  basicstyle={\lstfont}, 
+  keywordstyle={\bfseries},
+  keywordstyle={[2]\itshape}, % style for types
+  keepspaces,
+  mathescape, 
+  columns=fixed,
+  backgroundcolor = \color{light-gray}
+}[keywords,comments,strings]
 
 \usepackage{titling}% the wheel somebody else kindly made for us earlier
 \pretitle{% add some rules
@@ -120,10 +118,10 @@
 
 \title{$\bm{\lambda_Q}$ : A Simple Quantum Programming Language}
 \author{
-  Wenhao Tang\quad 1800013088
+  Wenhao Tang\quad \texttt{1800013088}
   % \texttt{first1.last1@xxxxx.com}
   \\[1ex]
-  Xinzhao Wang\quad 1800013102
+  Xinzhao Wang\quad \texttt{1800013102}
   % \texttt{first2.last2@xxxxx.com}
 }
 \affil{Department of EECS\\ Peking University}
@@ -156,5 +154,25 @@
 \input{frontend}
 
 \input{backend}
+
+\input{example}
+
+
+\section{Roles and Responsibilities}
+Wenhao Tang:
+\begin{itemize}
+  \item $\lambda_Q$ language design;
+  \item Implementation of Frontend;
+\end{itemize}
+
+\noindent Xinzhao Wang:
+\begin{itemize}
+  \item Implementation of Backend;
+\end{itemize}
+\mycomment{twh}{Supplement here @wxz.}
+
+\medskip
+
+\bibliography{reference}
 
 \end{document}

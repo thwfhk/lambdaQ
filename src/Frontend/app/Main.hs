@@ -48,7 +48,7 @@ main :: IO ()
 main = do
   args <- getArgs
   case args of
-    [sourceFileName] -> do
+    [sourceFileName, dstFileName] -> do
       sourceFile <- readFile sourceFileName
       -- print $ "Source: " ++ sourceFile
       case (runMyParser sourceFileName emptyctxs sourceFile) of
@@ -66,8 +66,11 @@ main = do
               mapM_ (\ ((Def s _), ty) -> putStrLn $ "  " ++ s ++ " : " ++ printType ty) (zip cmds'' tys)
               case (codeGeneration cmds'') of
                 Left err -> putStrLn $ "[GENERATION FAILED 😵]: " ++ err
-                Right qasm -> putStrLn $ "[GENERATION SUCCESS 🥳]:\n" ++ printQASM "  " qasm
-    _ -> putStrLn "source-file name not founded, enter REPL" >> repl
+                Right qasm -> do
+                  putStrLn $ "[GENERATION SUCCESS 🥳]:\n" ++ printQASM "  " qasm
+                  writeFile dstFileName $ printQASM "" qasm
+                  putStrLn $ "Intermediate code file name: " ++ dstFileName
+    _ -> putStrLn "file names error, enter REPL" >> repl
 
 deSugar :: [Command] -> [Command]
 deSugar = map (\ (Def s t) -> Def s (desugar t))

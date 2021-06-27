@@ -140,7 +140,7 @@ circ2QASM (CcGate p1 g p2 c) = case g of
     let (PtName var) = p1 in addMapping var creg
     (prog', outpat) <- circ2QASM c
     restore current
-    return ([SmQop (Measure qreg creg)] ++ prog', outpat)
+    return ([SmDecl (Creg creg), SmQop (Measure qreg creg)] ++ prog', outpat)
   Gt "discard" -> do
     circ2QASM c
   Gt "CNOT" -> do
@@ -189,7 +189,7 @@ genMeasure PtEmp PtEmp = return ([], PtEmp)
 genMeasure (PtName r) (PtName s) =
   if lastN 2 s == "@Q" then do
     r' <- pickNewReg
-    return ([SmQop (Measure r r')], PtName r')
+    return ([SmDecl (Creg r'), SmQop (Measure r r')], PtName r')
   else return ([], PtName r)
 -- genMeasure x y = do
 --   traceM $ show (x, y)

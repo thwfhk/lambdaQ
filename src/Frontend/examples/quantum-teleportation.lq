@@ -21,7 +21,8 @@ fun bob = / ((w1, w2), q) : Bit # Bit # Qubit .
                then (/ t : Qubit . gate X t)
                else (/ t : Qubit . output t)
          ) to q;
-    capp (if x1 then (/ t : Qubit . gate Z t) else (/ t : Qubit . output t)) to q
+    capp (if x1 then (/ t : Qubit . gate Z t) else (/ t : Qubit . output t))
+      to q
 
 -- teleport : Circ(1, qubit)
 fun teleport = / () : One .
@@ -30,4 +31,3 @@ fun teleport = / () : One .
   (x, y) <- capp alice to (q, a);
   capp bob to ((x, y), b);
 
-  

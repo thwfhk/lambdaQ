@@ -1,7 +1,6 @@
-\section{Motivation}
+\section{Introduction}
 Quantum computing is getting more and more popular these days.
 \mycomment{twh}{Add some background of quantum computing here @wxz.}
-blah\\
 blah\\
 blah\\
 blah\\
@@ -38,11 +37,27 @@ The current quantum programming languages can be categorized into two categories
 \end{multicols}
 
 Advanced quantum programming languages can use more powerful abstract constructs and type systems to make it easier for programmers to write correct quantum programs.
-In particular, we design a simple quantum programming language named $\lambda_Q$, which means $\lambda$-calculus with quantum circuit.
+In particular, we design a simple quantum programming language named $\lambda_Q$, which means \textbf{$\boldsymbol{\lambda}$-calculus with quantum circuit}.
 Its syntax consists of a traditional part, which is a simple $\lambda$-calculus, and a quantum part, whose syntax is based on Qwire, a functional quantum programming language with linear type system.
 What's more, we implement a compiler from $\lambda_Q$ to QASM (Quantum Assembly Language), an imperative quantum programming language with low-level instruction sets.
-The output QASM program can be run on the IBM cloud quantum machine.
+The output QASM program can run on the IBM cloud quantum machine.
 
 The main feature of $\lambda_Q$ is that the syntax for traditional computation and quantum computation are separated.
 They communicate with each other via some specific operations : quantum circuit can be \textit{abstracted} or \textit{lifted (measured)} into traditional term, and traditional term for quantum circuit can be applied to quantum bits.
-Thus, the syntax of quantum circuit can use linear type system to guarantee that the Quantum Non-cloning Theorem is not violated, meanwhile the $\lambda$-calculus of the traditional part makes it easier to write quantum programs.
+Thus, the syntax of quantum circuit can use \textit{linear type system} to guarantee that the Quantum Non-cloning Theorem is not violated, meanwhile the $\lambda$-calculus of the traditional part makes it easier to write quantum programs.
+We will explain it in detail in Section \ref{spec}.
+
+The overall structure of the compiler can be visualized in Figure \ref{compiler}.
+The frontend is implemented using \texttt{Haskell}, and the backend is implemented using \texttt{C}.
+The code can be found in \url{https://github.com/thwfhk/lambdaQ}.
+We will discuss the implementation of $\lambda_Q$ compiler in detail in Section \ref{front} and \ref{back}.
+
+
+\begin{center}
+  \begin{figure}
+    \label{compiler}
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/overview.png}
+    \caption{Structure of $\lambda_Q$ compiler.}
+  \end{figure}
+\end{center}
