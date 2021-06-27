@@ -1,0 +1,9 @@
+fun qwq = / () : One .
+  a <- gate init0 ();
+  b <- gate init0 ();
+  a <- gate H a;
+  b <- gate H b;
+  (c, d) <- gate CNOT (a, b);
+  c <- gate H c;
+  d <- gate H d;
+  output (c, d)

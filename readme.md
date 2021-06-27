@@ -13,6 +13,15 @@ This is a term project of the course *Compiler Principles* of Peking University.
 - [slides: `slides.pdf`](./LambdaQ-slides.pdf)
 - [report: `report/report.pdf`](report/report.pdf)
 
+## Usage
+### Build
+- Frontend: run `stack build` in the directory `src/Frontend`. The output executable file is in `.stack-work/install/xxxx/bin`.
+- Backend: run `makefile` in ...
+
+### Run
+- `frontend-exe input-file output-file`
+- `backend`
+
 ## Code Structure
 ### Frontend
 
