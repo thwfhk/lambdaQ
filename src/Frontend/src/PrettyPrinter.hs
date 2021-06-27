@@ -25,7 +25,8 @@ printWtype (WtProd wty1 wty2) = printWtype wty1 ++ " ⊗ " ++ printWtype wty2
 ----------------------------------------------------------------
 
 printQASM :: String -> Program -> String
-printQASM pre = foldr (\stmt s -> pre ++ printStmt stmt ++ "\n" ++ s) ""
+printQASM pre = ((pre ++ "openqasm 2.0;\n") ++)
+              . foldr (\stmt s -> pre ++ printStmt stmt ++ "\n" ++ s) ""
 
 printStmt :: Statement -> String
 printStmt (SmDecl decl) = case decl of
