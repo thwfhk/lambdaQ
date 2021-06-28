@@ -25,11 +25,13 @@ What's more, we use the mechanism of \textit{monad transformers} to deal with th
 Readers can refer to our code for more details.
 
 \subsection{Intermediate Code Generation}
-There are two main problems for the code generation from $\lambda_Q$ to the extended QASM.
+There are two main problems for the code generation from $\lambda_Q$ to the extended QASM. We briefly describe our solutions here.
+
 The first is to maintain the register and variable bindings.
+% Because QASM can use traditional bit
 We make use of the De Bruijn index maintain the traditional bit variables mapping.
 And we use a hash table and a counter to implement a register pool in a functional language, which is used to allocate new registers.
+
 The second is to deal with the restricted expressiveness of QASM.
 QASM only supports condition statements, so we restrict the term in $\capp\ t\ \mathtt{to}\ p$ to be the form of circuit abstraction or if statement whose branches are all circuit abstractions.
 This restriction can be loosed further, but we do not implement it yet because it is already enough to use.
-This part together with the syntax of extended QASM consists of about 300 lines.
