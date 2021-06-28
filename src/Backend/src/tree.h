@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <queue>
 #include <cmath>
+#include "graph.h"
 
 using namespace std;
 
@@ -37,12 +38,13 @@ struct Node *createLeaf(int tag, char *text);
 struct Node *createNode(int tag, int ncld, ...);
 // struct Node *createEmpty();
 void treePrint(struct Node * nd);
-void generate(struct Node * tree);
+void generate(struct Node * tree, Graph * g);
 
 bool qubit_allocation(vector<Constraint> &Phi);
 
 int get_qid(struct Node *);
 int get_cid(struct Node *);
+int get_cid_from_value(char * s, char * ind);
 
 
 extern map <string, int> qmap;
@@ -77,5 +79,10 @@ enum yyNTtype
     GATEDECL = 422,
     STATEMENT_GATEDECL = 423,
     STATEMENT_GATE_GOPLIST = 424,
+    UOP_X = 425,
+    UOP_Y = 426,
+    UOP_Z = 427,
+    UOP_H = 428,
+    UOP_RZ = 429,
 
 };

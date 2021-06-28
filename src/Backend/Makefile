@@ -6,11 +6,11 @@ VPATH = src
 SRC = src
 SUBDIRS = ./src
 
-$(OBJECT): parser.tab.c parser.tab.h lex.yy.c tree.c tree.h generator.c qubit_allocation.c
-	$(CC) $(SRC)/tree.c $(SRC)/lex.yy.c $(SRC)/parser.tab.c $(SRC)/generator.c $(SRC)/qubit_allocation.c -o $(OBJECT)
+$(OBJECT): parser.tab.c parser.tab.h lex.yy.c tree.cpp tree.h generator.cpp qubit_allocation.cpp graph.cpp graph.h optimization.cpp optimization.h
+	$(CC) $(SRC)/tree.cpp $(SRC)/lex.yy.c $(SRC)/parser.tab.c $(SRC)/generator.cpp $(SRC)/qubit_allocation.cpp $(SRC)/graph.cpp $(SRC)/optimization.cpp -o $(OBJECT)
 	@./$(OBJECT) #编译后立刻运行
 
-parser.tab.c parser.tab.h lex.yy.c: parser.y lex.l tree.h tree.c
+parser.tab.c parser.tab.h lex.yy.c: parser.y lex.l tree.h tree.cpp
 	@list='$(SUBDIRS)';for subdir in $$list; do \
 				cd $$subdir && make; \
 		done
