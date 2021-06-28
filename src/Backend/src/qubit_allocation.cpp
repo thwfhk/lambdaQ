@@ -35,14 +35,21 @@ int freeze[MAXN]; // 为0 说明已经出现过，不能改变initial mapping
 
 // 在vec给定的物理qubit中找到和degree最接近的物理qubit 
 int search(int degree, vector <int> &vec){
-    int min = nphy, ans;
+    int min = nphy, min_delta = -1, ans;
     int tmp = vec.size();
+    //printf("degree: %d\n", degree);
     for(int i = 0;i < tmp;i++){
         int u = vec[i];
         // 只考虑没有映射过的physical qubits
-        if(!used[u] && abs(degree-vertex_phy[u].out_degree) < min){
-            ans = u;
-            min = abs(degree-vertex_phy[u].out_degree);
+        //这里稍微修改了一点更新策略，如果有多的还是尽量分配多一点
+        if(!used[u]){
+            int delta = degree-vertex_phy[u].out_degree;
+            if(min_delta >= 0 && delta < 0) continue; 
+            if(min == nphy || (delta >= 0 && min_delta < 0) || abs(delta) < min){
+                ans = u;
+                min = abs(delta);
+                min_delta = delta;
+            }
         }
     }
     if(min != nphy)
@@ -52,6 +59,7 @@ int search(int degree, vector <int> &vec){
 }
 
 void bfs(int root){
+    //printf("call search %d\n", root);
     int qubit_mapped = search(vertex_logic[root].out_degree, all_phy);
     if(qubit_mapped == -1){
         fprintf(stderr, "bfs failed on root\n");
@@ -127,6 +135,7 @@ void swap(int & x, int & y){
 // 输入是物理 qubit 
 void swap_qubit(int phy_u, int phy_v, Graph * g){
     int u = l_cur_inv[phy_u], v = l_cur_inv[phy_v];
+    //printf("swap u: %d, v: %d\n", u,v);
     if(u == v) return ;//这个是新加的，不知道为什么有时候会调用相同的
     printf("// swap %d %d\n", u, v);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
     if(!freeze[u] && !freeze[v]){
@@ -174,6 +183,7 @@ void swap_qubit(int phy_u, int phy_v, Graph * g){
 
 int transform(int u, int v, Graph* g){
 // 更改ast中的argument 一定要在这里
+    //printf("transform %d %d\n", u, v);
     int phy_u = l_cur[u], phy_v = l_cur[v];
     if(hcnt[phy_u][phy_v]) {
         freeze[u] = 1;
@@ -226,6 +236,7 @@ int transform(int u, int v, Graph* g){
         }
         if(!flag){
             int t = bfs_minpath(phy_v, phy_u);
+            //printf("phy_u: %d, phy_v: %d, t: %d\n",phy_u, phy_v,t);
             if(t == -1){
                 fprintf(stderr, "This initial mapping is invalid\n");
                 exit(1);
@@ -274,11 +285,14 @@ bool qubit_allocation(vector<Constraint> &Phi){
         }
         gcnt[u][v] ++;
     }
-    sort(vertex_logic, vertex_logic+qcnt, cmp);
+    Vertex vertex_tmp[MAXN];
+    for(int i = 0;i < qcnt; i++)
+        vertex_tmp[i] = vertex_logic[i];
+    sort(vertex_tmp, vertex_tmp+qcnt, cmp);
 
     for(int i = 0;i < qcnt;i++){
-        printf("id: %d degree: %d\n", vertex_logic[i].id, vertex_logic[i].out_degree);
-        int v = vertex_logic[i].id;
+        printf("id: %d degree: %d\n", vertex_tmp[i].id, vertex_tmp[i].out_degree);
+        int v = vertex_tmp[i].id;
         if(visit[v] == 0) 
             bfs(v);
     }
@@ -289,7 +303,7 @@ bool qubit_allocation(vector<Constraint> &Phi){
     }
     for(int i = 0;i < nphy;i++){
         l_cur_inv[i] = l_inv[i];
-       // printf("l inv %d\n", l_inv[i]);
+        printf("l inv %d\n", l_inv[i]);
     }
 
     //printf("%d****", bfs_minpath(0,3));
