@@ -18,18 +18,18 @@ In \textit{qubit\_allocation.cpp}, we implement a heuristic algorithm  to alloca
 
 \subsubsection{Problem Definition}
 The most basic form of Qubit Allocation Problem is: given a quantum circuit and an architecture, we want to know if it is possible to map logic qubits in the former to physical qubits in the latter.
-Notice that even this basic form problem is already NP-hard.
+Notice that even this basic problem is NP-hard.
 
 In some cases, the constraints of the architecture is impossible to satisfy, and we need some circuit transformation to relax these constraints.
 
-There are three kinds of transformation we can apply:
+There are three kinds of transformations we can apply:
 \begin{itemize}
     \item[Reversal] Apply $CX$ to $(p,q)$ when $(q,p)$ is available in the architecture.
     \item[Bridge] Apply $CX$ to $(p,q)$ when $(p,s)$ and $(s, q)$ is available.
     \item[Swap] Swap the state of $p$ and $q$ when $(p,q)$ or $(q,p)$ is available.
 \end{itemize}
 
-All these transformation need extra gates to implement, so we need to find a qubit mapping and circuit transformations to satisfy the constraints with minimum number extra gates involved.
+All these transformation need extra gates to implement, so we need to find a qubit mapping and circuit transformations to satisfy the constraints with minimum number of extra gates involved.
 
 \subsubsection{Algorithm}
 
@@ -39,7 +39,7 @@ Our algorithm has two stages:
 
 We first sort the logic qubits in descending order of their occurrence counts.
 
-Then, for each logic qubit $q$ in order, we allocate $q$ to a physical qubit with the nearest out-degree(both the quantum circuit and the architecture can be regarded as a directed graph whose vertex is qubits)
+Then, for each logic qubit $q$ in order, we allocate $q$ to a physical qubit with the nearest out-degree(both the quantum circuit and the architecture can be regarded as a directed graph whose vertex is qubit)
 
 After $q$ is allocated to $p$, for each edge $(q,q')$, we try to allocate $q'$ to some $p'$ with edge $(p,p')$ and has the nearest out-degree.
 
@@ -51,7 +51,7 @@ After this BFS-like allocation we allocate the rest unallocated logic qubit to a
 
 The mapping $l$ in the output of the first stage may not satisfy all constraints, so we need to adjust it and apply circuit transformations to the quantum circuit.
 
-For any two qubit operation on $(p,q)$, if $(l(p),l(q))$ can't be implemented in current mapping, then:
+For any two qubits operation on $(p,q)$, if $(l(p),l(q))$ can't be implemented in current mapping, then:
 \begin{itemize}
     \item[1.] if $(p,q)$ appears more than once in the circuit, we use a Swap transformation to move $q$ closer to $p$ (Here we can use BFS to find the shortest path to $p$) and then re-evaluate these four cases.
     \item[2.] else if $(l(q), l(p))$ can be implemented, then we use a Reversal transformation to $l(q)$ and $l(p)$.
@@ -62,7 +62,7 @@ For any two qubit operation on $(p,q)$, if $(l(p),l(q))$ can't be implemented in
 
 Optimization for arbitary unitary gates is sophisticated, so we only consider cases when gates are chosen from a discrete set.
 
-In this section, we implement two basic optimization method for basis gate set $\{H, RZ, CX, X\}$
+In this section, we implement two basic optimization method for gate set $\{H, RZ, CX, X\}$
 
 Our work in this section can be divided into four parts: graph conversion, gate decomposition, Hardmard reduction and gate cancellation.
 
@@ -71,7 +71,7 @@ Readers can refer to \textit{generator.cpp, optimization.cpp, graph.h} for detai
 
 At first, we only store quantum circuit in the AST constructed by yacc and write \textit{generator.cpp} for code generation from AST (It retains this function in the final version)
 
-However, tree structure is not for gate optimization, since we often access the adjacent gate of a given gate, and they can be distant in AST.
+However, tree structure is not suitable for gate optimization, since we often access the adjacent gate of a given gate, and they can be distant in AST.
 
 Therefore, in \textit{generator.cpp}, we construct a graph from AST whose edge connects gates that are adjacent in the circuit.
 
@@ -83,9 +83,9 @@ Since available gate set in our modified OpenQasm2.0 is different from the gate 
 Notice that $HXH = Z, ZX = iY, U(\theta, \phi, \lambda) = R_z(\phi)R_x(-\frac{\pi}{2})R_z(\theta)R_x(\frac{\pi}{2})R_z(\lambda)\\$ and $HR_x(\theta)H = R_z(\theta)$, it is easy to implement this decomposition.
 
     \subsubsection{Hardmard Reduction}
-    In this section, we implement Hardmard Reduction to reduce number of Hardmard gate.
+    In this section, we implement Hardmard Reduction to reduce the number of Hardmard gate.
 
-    It is a simple pattern (\ref{pattern}) matching algorithm, we traverse the graph, find serveral subcircuit pattern and replace it with a simplfied equivalent subcircuit.
+    It is a simple pattern (\ref{pattern}) matching algorithm. We can traverse the graph, find serveral subcircuit pattern and replace it with a simplfied equivalent subcircuit.
 
 
     \begin{center}
@@ -100,7 +100,7 @@ Notice that $HXH = Z, ZX = iY, U(\theta, \phi, \lambda) = R_z(\phi)R_x(-\frac{\p
     \subsubsection{Gate Cancellation}
     When a pair of conjugate transpose gates are adjacent, they can both be cancelled.
 
-    In this section, we implement gate cancellation for $RZ$ gate, we traverse all $RZ$ gates and try to move it by swap with adjacent commutative subcircuit if posible (we only consider serveral  built-in commutation rules (\ref{commutation}) since it is hard to determine whether two gates are commutative) until encountering its conjugate transpose or reaching endpoints of the circuit.
+    In this section, we implement gate cancellation for $RZ$ gate, we traverse all $RZ$ gates and try to move it by swapping with adjacent commutative subcircuit if posible (we only consider serveral  built-in commutation rules (\ref{commutation}) since it is hard to determine whether two gates are commutative) until encountering its conjugate transpose or reaching endpoints of the circuit.
 
     \begin{center}
         \begin{figure}
