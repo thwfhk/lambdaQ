@@ -50,8 +50,25 @@ This is a term project of the course *Compiler Principles* of Peking University.
 ### Backend
 [`src/Backend`](src/Backend)
 
+#### Lexer & Parser
+- lexer : `src/Backend/src/lex.l`
+- parser : `src/Backend/src/parser.y`
+
+#### Qubit Allocation
+- qubit allocation : `src/Backend/src/qubit_allocation.cpp`
+
+#### Optimization
+- graph conversion : `src/Backend/src/generator.cpp`
+- optimization: `src/Backend/src/optimization.cpp`
+
+#### Code Generation
+- code generation from AST : `src/Backend/src/generation.cpp`
+- code generation from graph : `src/Backend/src/graph.h`   
+
 
 ## References
 - Cross, A. W., Bishop, L. S., Smolin, J. A., & Gambetta, J. M. (2017). Open quantum assembly language. arXiv preprint arXiv:1707.03429.
 - Paykin, J., Rand, R., & Zdancewic, S. (2017, January). QWIRE: a core language for quantum circuits. In Proceedings of the 44th ACM SIGPLAN Symposium on Principles of Programming Languages (pp. 846-858).
 - Rand, R., Paykin, J., & Zdancewic, S. (2018). QWIRE practice: Formal verification of quantum circuits in Coq. arXiv preprint arXiv:1803.00699.
+- Nam, Y., Ross, N.J., Su, Y. et al. Automated optimization of large quantum circuits with continuous parameters. npj Quantum Inf 4, 23 (2018). https://doi.org/10.1038/s41534-018-0072-4
+- Marcos Yukio Siraichi, Vinícius Fernandes dos Santos, Sylvain Collange, and Fernando Magno Quintao Pereira. 2018. Qubit allocation. In Proceedings of the 2018 International Symposium on Code Generation and Optimization (CGO 2018). Association for Computing Machinery, New York, NY, USA, 113–125. DOI:https://doi.org/10.1145/3168822
