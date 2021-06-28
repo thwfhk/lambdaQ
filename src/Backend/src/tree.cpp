@@ -1,8 +1,8 @@
 #include "parser.tab.h"
 #include "tree.h"
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
  
 map <string, int> qmap;
 map <string, int> cmap;
@@ -74,12 +74,25 @@ void treePrint(struct Node *nd)
 }
 
 int get_qid(struct Node * x){
-	string id = x->cld[0]->value;
-	int n = atoi(x->cld[1]->value);
-	return qmap[id] + n;
+	if(x->tag == ID)
+		return qmap[x->value];
+	else{
+		string id = x->cld[0]->value;
+		int n = atoi(x->cld[1]->value);
+		return qmap[id] + n;
+	}
 }
 int get_cid(struct Node * x){
-	string id = x->cld[0]->value;
-	int n = atoi(x->cld[1]->value);
+	if(x->tag == ID)
+		return cmap[x->value];
+	else{
+		string id = x->cld[0]->value;
+		int n = atoi(x->cld[1]->value);
+		return cmap[id] + n;
+	}
+}
+int get_cid_from_value(char * s, char * ind){
+	string id = s;
+	int n = atoi(ind);
 	return cmap[id] + n;
 }

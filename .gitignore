@@ -1,3 +1,8 @@
 .stack-work/
 *~
 *.DS_Store
+*.tab.c
+*.tab.h
+parser
+parser.output
+*.yy.c
