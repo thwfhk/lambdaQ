@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999992 (TeX Live 2020) (preloaded format=xelatex 2020.4.28)  28 JUN 2021 20:45
+This is XeTeX, Version 3.14159265-2.6-0.999992 (TeX Live 2020) (preloaded format=xelatex 2020.4.28)  28 JUN 2021 22:31
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1028,21 +1028,18 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 179.
 Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 179.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 179.
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: ED2811ED301EBADB2CACD24C4B306A41;1969.
+(rerunfilecheck)             Checksum: 2758BEA3FFBC2143BB1A89F0BD527FDA;1969.
 
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.74pt have occurred.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 179.
  ) 
 Here is how much of TeX's memory you used:
  19072 strings out of 479418
  331120 string characters out of 5884585
- 704703 words of memory out of 5000000
+ 704704 words of memory out of 5000000
  36161 multiletter control sequences out of 15000+600000
  557787 words of font info for 176 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191

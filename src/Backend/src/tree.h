@@ -51,7 +51,7 @@ extern map <string, int> qmap;
 extern map <string, int> cmap;
 extern int qcnt, ccnt; //记录当前使用的bit个数
 extern vector <Constraint> Phi;
-
+extern const char * structure_file;
 enum yyNTtype
 {
     HEADER = 400,

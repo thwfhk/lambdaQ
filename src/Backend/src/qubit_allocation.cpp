@@ -254,7 +254,7 @@ int transform(int u, int v, Graph* g){
 bool qubit_allocation(vector<Constraint> &Phi){
     //读入计算机的结构
 
-    FILE* fp=fopen("test/structure.txt", "r");
+    FILE* fp=fopen(structure_file, "r");
     fscanf(fp, "%d", &nphy);
     int u, v;
     for(int i = 0;i < nphy; i++){
@@ -291,7 +291,7 @@ bool qubit_allocation(vector<Constraint> &Phi){
     sort(vertex_tmp, vertex_tmp+qcnt, cmp);
 
     for(int i = 0;i < qcnt;i++){
-        printf("id: %d degree: %d\n", vertex_tmp[i].id, vertex_tmp[i].out_degree);
+        //printf("id: %d degree: %d\n", vertex_tmp[i].id, vertex_tmp[i].out_degree);
         int v = vertex_tmp[i].id;
         if(visit[v] == 0) 
             bfs(v);
@@ -303,7 +303,7 @@ bool qubit_allocation(vector<Constraint> &Phi){
     }
     for(int i = 0;i < nphy;i++){
         l_cur_inv[i] = l_inv[i];
-        printf("l inv %d\n", l_inv[i]);
+        //printf("l inv %d\n", l_inv[i]);
     }
 
     //printf("%d****", bfs_minpath(0,3));

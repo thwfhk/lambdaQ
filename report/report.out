@@ -14,7 +14,7 @@
 \BOOKMARK [2][-]{subsection.3.4}{Intermediate\040Code\040Generation}{section.3}% 14
 \BOOKMARK [1][-]{section.4}{Backend}{}% 15
 \BOOKMARK [2][-]{subsection.4.1}{Lexer\040&\040Parser}{section.4}% 16
-\BOOKMARK [2][-]{subsection.4.2}{Qubit\040allocation}{section.4}% 17
+\BOOKMARK [2][-]{subsection.4.2}{Qubit\040Allocation}{section.4}% 17
 \BOOKMARK [3][-]{subsubsection.4.2.1}{Problem\040Definition}{subsection.4.2}% 18
 \BOOKMARK [3][-]{subsubsection.4.2.2}{Algorithm}{subsection.4.2}% 19
 \BOOKMARK [2][-]{subsection.4.3}{Optimization}{section.4}% 20
