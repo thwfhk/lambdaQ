@@ -31,21 +31,21 @@ void H_reduction(Graph * g){
     for(int qid = 0;qid < qcnt;qid++){
         //每一个都从记录的最早的gate 开始
         int cur = q_first[qid];
-        printf("current qid %d\n",qid);
+        //printf("current qid %d\n",qid);
         // 遍历qreg i 经历的所有门
         while(cur >= 0){
-            printf("current node id: %d\n", cur);
-            g->vertex[cur].print();
+            //printf("current node id: %d\n", cur);
+            //g->vertex[cur].print();
             node cur_node = g->vertex[cur];
             int u_prev, v_prev, u_next, v_next;//分别记录匹配块的前后的节点编号
             int another_qid = -1; //和qid并行的qid
             u_prev = g->prev_node(cur, qid);
-            printf("cur: %d u_prev: %d\n", cur, u_prev);
+            //printf("cur: %d u_prev: %d\n", cur, u_prev);
             for(int i = 0;i < NPAT;i++){
                 bool match = true;
                 int matching_id = cur;
                 int matching_len = 0;
-                printf("try to match pattern %d\n", i);
+                //printf("try to match pattern %d\n", i);
                 for(int k = 0;k < MAXPAT;k++){
                     if(pattern[i][k].tag == 0){
                         break; //模式到头了
@@ -75,7 +75,7 @@ void H_reduction(Graph * g){
                             }
                         }
                     }
-                    printf("%d nodes matched\n", k+1);
+                    //printf("%d nodes matched\n", k+1);
                     u_next = g->next_node(matching_id, qid);
                     //时刻记录当前匹配节点的下一个节点
                     matching_len ++;
@@ -83,7 +83,7 @@ void H_reduction(Graph * g){
                 }
                 //第i个pattern 匹配了
                 if(match){
-                    printf("pattern %d mathed!wawawawa happy!!!\n", i);
+                    printf("Hardmard reduction: pattern %d mathed!!! wawawawa happy!!!\n", i);
                     // 先删除cur 之后匹配的节点
                     //printf("graph before************\n");
                     //g->printedge();
@@ -150,7 +150,7 @@ bool isDagger(node u, node v){
 void singleQubitCancellation(Graph *g){
     for(int qid = 0; qid < qcnt;qid++){
         int origin_id = q_first[qid];
-        printf("current qid %d\n",qid);
+        //printf("current qid %d\n",qid);
         while(origin_id >= 0){
             node origin_node = g->vertex[origin_id];
             bool early_update_origin = false;
@@ -159,8 +159,8 @@ void singleQubitCancellation(Graph *g){
                 if(cur_id < 0)
                     break;
                 int elim_id = 0;
-                printf("current origin node id: %d\n", origin_id);
-                g->vertex[origin_id].print();
+                //printf("current origin node id: %d\n", origin_id);
+                //g->vertex[origin_id].print();
                 bool adj = false;
                 if(isDagger(g->vertex[cur_id], g->vertex[origin_id])){
                     //如果直接就能匹配
@@ -171,7 +171,7 @@ void singleQubitCancellation(Graph *g){
                     bool update = false;
                     for(int rule_id = 0;rule_id < NRULES;rule_id++){
                         bool match = true;
-                        printf("try to match pattern %d\n", rule_id);
+                        //printf("try to match pattern %d\n", rule_id);
                         int matching_id = cur_id;
                         for(int matched_cnt = 0; matched_cnt < MAXRES;matched_cnt++){
                             if(single_commute_rules[rule_id][matched_cnt] == 0){
@@ -191,11 +191,11 @@ void singleQubitCancellation(Graph *g){
                             if(rule_id == 1 && matched_cnt == 0){
                                 //这里需要检查一下两个cx之间没有其他东西
                             }
-                            printf("%d nodes matched \n", matched_cnt+1);
+                            //printf("%d nodes matched \n", matched_cnt+1);
                             matching_id = g->next_node(matching_id, qid);
                         }
                         if(match){
-                            printf("pattern %d mathed!wawawawa happy!!!\n", rule_id);
+                            printf("Gate cancellation: pattern %d mathed! wawawawa happy!!!\n", rule_id);
                             //这里只要match上就一定选择移动
                             cur_id = matching_id;
                             update = true;

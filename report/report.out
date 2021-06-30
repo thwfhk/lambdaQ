@@ -14,7 +14,7 @@
 \BOOKMARK [2][-]{subsection.3.4}{Intermediate\040Code\040Generation}{section.3}% 14
 \BOOKMARK [1][-]{section.4}{Backend}{}% 15
 \BOOKMARK [2][-]{subsection.4.1}{Lexer\040&\040Parser}{section.4}% 16
-\BOOKMARK [2][-]{subsection.4.2}{Qubit\040allocation}{section.4}% 17
+\BOOKMARK [2][-]{subsection.4.2}{Qubit\040Allocation}{section.4}% 17
 \BOOKMARK [3][-]{subsubsection.4.2.1}{Problem\040Definition}{subsection.4.2}% 18
 \BOOKMARK [3][-]{subsubsection.4.2.2}{Algorithm}{subsection.4.2}% 19
 \BOOKMARK [2][-]{subsection.4.3}{Optimization}{section.4}% 20
@@ -26,4 +26,8 @@
 \BOOKMARK [2][-]{subsection.5.1}{Quantum\040Teleportation}{section.5}% 26
 \BOOKMARK [2][-]{subsection.5.2}{Simple\040Optimization}{section.5}% 27
 \BOOKMARK [1][-]{section.6}{Roles\040and\040Responsibilities}{}% 28
+<<<<<<< HEAD
 \BOOKMARK [1][-]{section.6}{References}{}% 29
+=======
+\BOOKMARK [1][-]{section.6}{Bibliography}{}% 29
+>>>>>>> 354098b0f68830567d24af4fc23024c043f36016

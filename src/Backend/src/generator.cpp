@@ -64,7 +64,7 @@ void generate(struct Node * tree, Graph * g){
             break;
         }
         case HEADER:{
-            printf("OPENQASM ");
+            printf("openqasm ");
             generate(tree->cld[0], g);
             printf(";\n");
             int t = g->addVertex(OPENQASM);
@@ -263,14 +263,19 @@ void generate(struct Node * tree, Graph * g){
             printf("Y ");
             int u = generate_qreg(tree->cld[0]);
             printf(";\n");
-            g->addSingleQubitVertex(Y, u);
+            g->addSingleQubitVertex(H, u);
+            g->addSingleQubitVertex(X, u);
+            g->addSingleQubitVertex(H, u);
+            g->addSingleQubitVertex(X, u);
             break;
         }
         case UOP_Z:{
             printf("Z ");
             int u = generate_qreg(tree->cld[0]);
             printf(";\n");
-            g->addSingleQubitVertex(Z, u);
+            g->addSingleQubitVertex(H, u);
+            g->addSingleQubitVertex(X, u);
+            g->addSingleQubitVertex(H, u);
             break;
         }
         case UOP_CX:{
@@ -305,8 +310,14 @@ void generate(struct Node * tree, Graph * g){
             printf(";\n");
             int t = g->addVertex(MEASURE);
             g->vertex[t].arg_int[0] = u;
-            g->vertex[t].arg_int[1] = atoi(tree->cld[1]->cld[1]->value);
-            g->vertex[t].arg_char = tree->cld[1]->cld[0]->value;
+            if(tree->cld[1]->tag == ID){
+                g->vertex[t].arg_int[1] = 0;
+                g->vertex[t].arg_char = tree->cld[1]->value;
+            }
+            else{
+                g->vertex[t].arg_int[1] = atoi(tree->cld[1]->cld[1]->value);
+                g->vertex[t].arg_char = tree->cld[1]->cld[0]->value;
+            }
             g->addEdge(q_last[u], t, u);
             int cid = get_cid(tree->cld[1]);// creg 的编号
             g->addEdge(c_last[cid], t, -cid);
