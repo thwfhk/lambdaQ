@@ -5,12 +5,9 @@
 \usepackage{amsmath,amsfonts,graphicx,amssymb,bm,amsthm}
 \usepackage{mathtools}
 \usepackage{mathrsfs}
-\usepackage[square, numbers]{natbib}
-\bibliographystyle{abbrv}
 \usepackage{lastpage}
 \usepackage{paralist}
 \usepackage{booktabs}
-\usepackage[colorlinks]{hyperref}
 \geometry{left=3.17cm, right=3.17cm, top=2.54cm, bottom=2.54cm} % A4纸
 \usepackage{fancyhdr}
 \usepackage{graphicx}
@@ -116,14 +113,20 @@
   {\normalfont\fontsize{11}{17}\sffamily\bfseries\slshape}
   {\thesubsubsection}{1em}{}
 
+% \usepackage[]{natbib}
+% \bibliographystyle{acm}
+\usepackage[square, numbers]{natbib}
+\bibliographystyle{abbrv}
+\usepackage[colorlinks]{hyperref}
+
 \newcommand{\mycomment}[2]{{\small\color{magenta}\underline{\sf{#1}}:} {\color{magenta}{\small #2}}}
 
 \title{$\bm{\lambda_Q}$ : A Simple Quantum Programming Language}
 \author{
-  Wenhao Tang\quad \texttt{1800013088}
+  Wenhao Tang\quad \texttt{1800013088}\quad \texttt{tangwh@pku.edu.cn}
   % \texttt{first1.last1@xxxxx.com}
   \\[1ex]
-  Xinzhao Wang\quad \texttt{1800013102}
+  Xinzhao Wang\quad \texttt{1800013102}\quad \texttt{wangxz@pku.edu.cn}
   % \texttt{first2.last2@xxxxx.com}
 }
 \affil{Department of EECS\\ Peking University}
@@ -164,14 +167,14 @@
 Wenhao Tang:
 \begin{itemize}
   \item $\lambda_Q$ language design;
-  \item Implementation of Frontend;
+  \item Implementation of Frontend.
 \end{itemize}
 
 \noindent Xinzhao Wang:
 \begin{itemize}
-  \item Implementation of Backend;
+  \item Implementation of Backend.
 \end{itemize}
-\mycomment{twh}{Supplement here @wxz.}
+% \mycomment{twh}{Supplement here @wxz.}
 
 \medskip
 

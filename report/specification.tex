@@ -128,6 +128,9 @@ Since there are some different kinds of terms: ($\lambda$-)terms, wire patterns,
 Note that since we only support built-in gates, the typing rules for gates are extremely simple, just assigning a type to each built-in gate.
 
 \noindent \textbf{Typing rules for gates}: $\boxed{g : G}$
+
+~
+
 \renewcommand\arraystretch{2.5}
 \begin{longtable}[c]{cr}
   $ \infer{\new_0 : \calG(\One, \Bit)}{}$ & \\
@@ -136,6 +139,10 @@ Note that since we only support built-in gates, the typing rules for gates are e
   $ \infer{\init_1 : \calG(\One, \Qubit)}{}$ & \\
   $ \infer{\meas : \calG(\Qubit, \Bit)}{}$ & \\
   $ \infer{\discard : \calG(\Bit, \One)}{}$ & \\
+  $ \infer{\Ha : \calG(\Qubit, \Qubit)}{}$ & \\
+  $ \infer{\X : \calG(\Qubit, \Qubit)}{}$ & \\
+  $ \infer{\Z : \calG(\Qubit, \Qubit)}{}$ & \\
+  $ \infer{\CNOT : \calG((\Qubit, \Qubit), (\Qubit, \Qubit))}{}$ & \\
 \end{longtable}
 
 \subsubsection{Typing rules for patterns}

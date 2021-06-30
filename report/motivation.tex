@@ -44,8 +44,8 @@ The current quantum programming languages can be categorized into two categories
 
 Advanced quantum programming languages can use more powerful abstract constructs and type systems to make it easier for programmers to write correct quantum programs.
 In particular, we design a simple quantum programming language named $\lambda_Q$, which means \textbf{$\boldsymbol{\lambda}$-calculus with quantum circuit}.
-Its syntax consists of a traditional part, which is a simple $\lambda$-calculus, and a quantum part, whose syntax is based on Qwire, a functional quantum programming language with linear type system.
-What's more, we implement a compiler from $\lambda_Q$ to QASM (Quantum Assembly Language), an imperative quantum programming language with low-level instruction sets.
+Its syntax consists of a traditional part, which is a simple $\lambda$-calculus, and a quantum part, whose syntax is based on Qwire~\cite{qwire}, a functional quantum programming language with linear type system.
+What's more, we implement a compiler from $\lambda_Q$ to QASM (Quantum Assembly Language) ~\cite{qasm}, an imperative quantum programming language with low-level instruction sets.
 The output QASM program can run on the IBM cloud quantum machine.
 
 The main feature of $\lambda_Q$ is that the syntax for traditional computation and quantum computation are separated.
