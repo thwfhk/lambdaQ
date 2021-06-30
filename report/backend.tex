@@ -33,7 +33,7 @@ All these transformation need extra gates to implement, so we need to find a qub
 
 \subsubsection{Algorithm}
 
-Our algorithm has two stages:
+Our algorithm~\cite{qa} has two stages:
 
 \textbf{First stage}: Find an intial mapping
 
@@ -60,7 +60,7 @@ For any two qubits operation on $(p,q)$, if $(l(p),l(q))$ can't be implemented i
 \end{itemize}
 \subsection{Optimization}
 
-Optimization for arbitary unitary gates is sophisticated, so we only consider cases when gates are chosen from a discrete set.
+Optimization \cite{Nam_2018} for arbitary unitary gates is sophisticated, so we only consider cases when gates are chosen from a discrete set.
 
 In this section, we implement two basic optimization method for gate set $\{H, RZ, CX, X\}$
 
@@ -102,12 +102,12 @@ Notice that $HXH = Z, ZX = iY, U(\theta, \phi, \lambda) = R_z(\phi)R_x(-\frac{\p
 
     In this section, we implement gate cancellation for $RZ$ gate, we traverse all $RZ$ gates and try to move it by swapping with adjacent commutative subcircuit if posible (we only consider serveral  built-in commutation rules (\ref{commutation}) since it is hard to determine whether two gates are commutative) until encountering its conjugate transpose or reaching endpoints of the circuit.
 
-    \begin{center}
-        \begin{figure}
-            \label{commutation}
-            \centering
-            \includegraphics[width=0.9\linewidth]{images/gate_cancellation.png}
-            \caption{Commutation rules for RZ gate}
-        \end{figure}
-    \end{center}
+\begin{center}
+    \begin{figure}
+        \label{commutation}
+        \centering
+        \includegraphics[width=0.9\linewidth]{images/gate_cancellation.png}
+        \caption{Commutation rules for RZ gate}
+    \end{figure}
+\end{center}
 
