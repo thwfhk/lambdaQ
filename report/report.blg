@@ -1,95 +1,46 @@
-<<<<<<< HEAD
 This is BibTeX, Version 0.99d (TeX Live 2019)
 Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: report.aux
 The style file: abbrv.bst
 Database file #1: reference.bib
-You've used 2 entries,
+You've used 4 entries,
             2118 wiz_defined-function locations,
-            507 strings with 4045 characters,
-and the built_in function-call counts, 804 in all, are:
-= -- 76
-> -- 41
-< -- 1
-+ -- 16
-- -- 14
-* -- 52
-:= -- 133
-add.period$ -- 6
-call.type$ -- 2
-change.case$ -- 13
+            522 strings with 4577 characters,
+and the built_in function-call counts, 1699 in all, are:
+= -- 168
+> -- 92
+< -- 2
++ -- 36
+- -- 32
+* -- 111
+:= -- 271
+add.period$ -- 13
+call.type$ -- 4
+change.case$ -- 28
 chr.to.int$ -- 0
-cite$ -- 2
-duplicate$ -- 33
-empty$ -- 59
-format.name$ -- 14
-if$ -- 170
+cite$ -- 4
+duplicate$ -- 76
+empty$ -- 113
+format.name$ -- 32
+if$ -- 369
 int.to.chr$ -- 0
-int.to.str$ -- 2
-missing$ -- 2
-newline$ -- 13
-num.names$ -- 4
-pop$ -- 16
+int.to.str$ -- 4
+missing$ -- 4
+newline$ -- 23
+num.names$ -- 8
+pop$ -- 30
 preamble$ -- 1
-purify$ -- 11
+purify$ -- 24
 quote$ -- 0
-skip$ -- 27
+skip$ -- 68
 stack$ -- 0
-substring$ -- 42
-swap$ -- 12
-text.length$ -- 1
+substring$ -- 70
+swap$ -- 33
+text.length$ -- 2
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 8
+type$ -- 16
 warning$ -- 0
-while$ -- 7
-width$ -- 3
-write$ -- 23
-=======
-This is BibTeX, Version 0.99d (TeX Live 2020)
-Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
-The top-level auxiliary file: report.aux
-The style file: abbrv.bst
-Database file #1: reference.bib
-You've used 1 entry,
-            2118 wiz_defined-function locations,
-            503 strings with 3908 characters,
-and the built_in function-call counts, 502 in all, are:
-= -- 49
-> -- 18
-< -- 1
-+ -- 7
-- -- 6
-* -- 31
-:= -- 76
-add.period$ -- 3
-call.type$ -- 1
-change.case$ -- 6
-chr.to.int$ -- 0
-cite$ -- 1
-duplicate$ -- 23
-empty$ -- 42
-format.name$ -- 6
-if$ -- 112
-int.to.chr$ -- 0
-int.to.str$ -- 1
-missing$ -- 1
-newline$ -- 8
-num.names$ -- 2
-pop$ -- 9
-preamble$ -- 1
-purify$ -- 5
-quote$ -- 0
-skip$ -- 20
-stack$ -- 0
-substring$ -- 37
-swap$ -- 11
-text.length$ -- 1
-text.prefix$ -- 0
-top$ -- 0
-type$ -- 4
-warning$ -- 0
-while$ -- 5
-width$ -- 2
-write$ -- 13
->>>>>>> 354098b0f68830567d24af4fc23024c043f36016
+while$ -- 12
+width$ -- 5
+write$ -- 48

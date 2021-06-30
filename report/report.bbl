@@ -1,17 +1,27 @@
 \begin{thebibliography}{1}
 
-<<<<<<< HEAD
 \bibitem{qasm}
 A.~W. Cross, L.~S. Bishop, J.~A. Smolin, and J.~M. Gambetta.
 \newblock Open quantum assembly language.
 \newblock {\em arXiv preprint arXiv:1707.03429}, 2017.
 
-=======
->>>>>>> 354098b0f68830567d24af4fc23024c043f36016
+\bibitem{Nam_2018}
+Y.~Nam, N.~J. Ross, Y.~Su, A.~M. Childs, and D.~Maslov.
+\newblock Automated optimization of large quantum circuits with continuous
+  parameters.
+\newblock {\em npj Quantum Information}, 4(1), May 2018.
+
 \bibitem{qwire}
 J.~Paykin, R.~Rand, and S.~Zdancewic.
 \newblock Qwire: a core language for quantum circuits.
 \newblock In {\em Proceedings of the 44th ACM SIGPLAN Symposium on Principles
   of Programming Languages}, pages 846--858, 2017.
+
+\bibitem{qa}
+M.~Y. Siraichi, V.~F.~d. Santos, S.~Collange, and F.~M.~Q. Pereira.
+\newblock Qubit allocation.
+\newblock In {\em Proceedings of the 2018 International Symposium on Code
+  Generation and Optimization}, CGO 2018, page 113–125, New York, NY, USA,
+  2018. Association for Computing Machinery.
 
 \end{thebibliography}
