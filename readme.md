@@ -24,7 +24,7 @@ Some tools such as `stack` and `g++` are needed to compile this project.
 
 Examples:
 - `build/frontend examples/quantum-teleportation.lq ir.qasm`
-- `build/backend ir.qasm out.qasm`
+- `build/backend ir.qas examples/structure.txt out.qasm`
 
 ## Code Structure
 ### Frontend

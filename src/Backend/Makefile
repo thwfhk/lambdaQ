@@ -1,7 +1,7 @@
 LEX=flex
 YACC=bison
 CC=g++
-OBJECT=parser #生成的目标文件
+OBJECT=../../build/backend #生成的目标文件
 VPATH = src
 SRC = src
 SUBDIRS = ./src

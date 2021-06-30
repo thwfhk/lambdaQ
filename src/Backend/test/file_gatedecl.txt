@@ -1,4 +1,0 @@
-openqasm 1.3;
-gate vasef fd, fd{
-gate fdsa() fd, fda, fd{
-gate fdf(fd, fds, fd) fa, fa{

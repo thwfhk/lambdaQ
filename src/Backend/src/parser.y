@@ -3,6 +3,13 @@
 #include "graph.h"
 #include "optimization.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+
 extern "C"{
 void yyerror(struct Node** root, const char *s);
 extern int yylex(void);
@@ -349,6 +356,7 @@ int main(int argc, char ** argv)//程序主函数，这个函数也可以放到�
     //yydebug = 1;
 
 	const char* sFile = argv[1];//打开要读取的文本文件
+	const char* outfile = argv[3];
 	structure_file = argv[2];
 	FILE* fp=fopen(sFile, "r");
 	if(fp==NULL)
@@ -377,6 +385,7 @@ int main(int argc, char ** argv)//程序主函数，这个函数也可以放到�
 	}
 
 	Graph g;
+	int save_fd = dup(STDOUT_FILENO);
     generate(root, &g);
 	//printf("heell\n");
 	//g.toposort();
@@ -384,6 +393,7 @@ int main(int argc, char ** argv)//程序主函数，这个函数也可以放到�
 	H_reduction(&g);
 	singleQubitCancellation(&g);
 	//printf("after reduction********\n");
+	freopen(outfile,"w",stdout);
 	g.toposort();
 	//g.printedge();
 	fclose(fp);
