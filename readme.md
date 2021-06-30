@@ -1,7 +1,5 @@
 # **λQ**: A Simple Quantum Programming Language
 
-(Work In Progress)
-
 λQ is a simple quantum programming language based on [QWIRE](https://github.com/inQWIRE/QWIRE) with a compiler to [QASM](https://github.com/Qiskit/openqasm).
 
 The name λQ means ***lambda calculus with quantum circuits***.
@@ -10,17 +8,22 @@ This is a term project of the course *Compiler Principles* of Peking University.
 
 
 ## Report
-- [slides: `slides.pdf`](./LambdaQ-slides.pdf)
+- [slides: `report/slides.pdf`](report/slides.pdf)
 - [report: `report/report.pdf`](report/report.pdf)
 
 ## Usage
+
+The frontend is written in Haskell and the backend is written in C++.
+Some tools such as `stack` and `g++` are needed to compile this project.
 ### Build
-- Frontend: run `stack build` in the directory `src/Frontend`. The output executable file is in `.stack-work/install/xxxx/bin`.
-- Backend: run `makefile` in ...
+- Run `./build.sh`. The output programs are in the directory `build`.
 
 ### Run
-- `frontend-exe input-file output-file`
-- `backend`
+- Frontend: `build/frontend input-file-name output-file-name`.
+- Backend: `build/backend input-file-name output-file-name`
+Examples:
+- `build/frontend examples/quantum-teleportation.lq ir.qasm`
+- `build/backend ir.qasm out.qasm`
 
 ## Code Structure
 ### Frontend
