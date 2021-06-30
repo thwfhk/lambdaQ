@@ -8,6 +8,7 @@ map <string, int> qmap;
 map <string, int> cmap;
 int qcnt = 0, ccnt = 0; //记录当前使用的bit个数
 vector <Constraint> Phi;
+const char * structure_file;
 struct Node *createLeaf(int tag, char *text)
 {
 	struct Node *nd=(struct Node*)malloc(sizeof(struct Node));

@@ -1,10 +1,13 @@
 \begin{thebibliography}{1}
 
+<<<<<<< HEAD
 \bibitem{qasm}
 A.~W. Cross, L.~S. Bishop, J.~A. Smolin, and J.~M. Gambetta.
 \newblock Open quantum assembly language.
 \newblock {\em arXiv preprint arXiv:1707.03429}, 2017.
 
+=======
+>>>>>>> 354098b0f68830567d24af4fc23024c043f36016
 \bibitem{qwire}
 J.~Paykin, R.~Rand, and S.~Zdancewic.
 \newblock Qwire: a core language for quantum circuits.

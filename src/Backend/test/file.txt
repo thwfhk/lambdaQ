@@ -1,17 +1,14 @@
 openqasm 2.0;
-qreg q[2];
-RZ(-pi/2) q[1];
-
-CX q[1], q[0];
-
-H q[1];
-CX q[0], q[1];
-H q[1];
-
-CX q[1], q[0];
-
-CX q[0], q[1];
-RZ(pi) q[1];
-CX q[0], q[1];
-
-RZ(pi/2) q[1];
+qreg r0[1];
+qreg r1[1];
+qreg r2[1];
+H r1;
+CX r1, r2;
+CX r0, r1;
+H r0;
+creg r3[1];
+measure r0 -> r3;
+creg r4[1];
+measure r1 -> r4;
+if (r4 == 1) X r2;
+if (r3 == 1) Z r2;
