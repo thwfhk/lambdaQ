@@ -1,0 +1,9 @@
+\begin{thebibliography}{1}
+
+\bibitem{qwire}
+J.~Paykin, R.~Rand, and S.~Zdancewic.
+\newblock Qwire: a core language for quantum circuits.
+\newblock In {\em Proceedings of the 44th ACM SIGPLAN Symposium on Principles
+  of Programming Languages}, pages 846--858, 2017.
+
+\end{thebibliography}
