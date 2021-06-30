@@ -14,7 +14,8 @@ This is a term project of the course *Compiler Principles* of Peking University.
 ## Usage
 
 The frontend is written in Haskell and the backend is written in C++.
-Some tools such as `stack` and `g++` are needed to compile this project.
+Some tools such as `stack`, `g++`, `flex` and `bison` are needed to compile this project.
+The executables in the directory `build` are suitable for macOS.
 ### Build
 - Run `./build.sh`. The output programs are in the directory `build`.
 
@@ -24,7 +25,9 @@ Some tools such as `stack` and `g++` are needed to compile this project.
 
 Examples:
 - `build/frontend examples/quantum-teleportation.lq ir.qasm`
-- `build/backend ir.qas examples/structure.txt out.qasm`
+- `build/backend ir.qasm examples/structure.txt out.qasm`
+
+![examples](examples.png)
 
 ## Code Structure
 ### Frontend
