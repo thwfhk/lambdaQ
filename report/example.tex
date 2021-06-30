@@ -65,11 +65,20 @@ if (r3 == 1) Z r2;
 And the output of the backend is:
 \begin{lstlisting}[language=lambda]
 openqasm 2.0;
-qreg q[2];
-CX q[1], q[0];
+qreg q[3];
+H q[1];
+CX q[1], q[2];
+CX q[0], q[1];
+H q[0];
+creg r3[1];
+measure q[0]->r3;
+creg r4[1];
+measure q[1]->r4;
+if(r4 == 1) X q[2];
+if(r3 == 1) Z q[2];
 \end{lstlisting}
 
-The optimization really works!
+There is not too much difference between IR and output because this quantum does not fit any optimization.
 
 \subsection{Simple Optimization}
 Here is another simple example to show the optimization power of our backend.

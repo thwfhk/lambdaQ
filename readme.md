@@ -20,7 +20,8 @@ Some tools such as `stack` and `g++` are needed to compile this project.
 
 ### Run
 - Frontend: `build/frontend input-file-name output-file-name`.
-- Backend: `build/backend input-file-name output-file-name`
+- Backend: `build/backend input-file-name structure-file-name output-file-name`
+
 Examples:
 - `build/frontend examples/quantum-teleportation.lq ir.qasm`
 - `build/backend ir.qasm out.qasm`
